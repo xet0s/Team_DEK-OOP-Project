@@ -1,1 +1,17 @@
+# Python gereksizleri
+_pycache_/
+*.py[cod]
+
+# Sanal Ortam (HERKES KENDİ BİLGİSAYARINDA KURMALI)
+env/
+venv/
 .venv
+.env
+
+# Veritabanı (Çakışma olmasın diye herkesin kendi lokal db'si olsun)
+*.db
+*.sqlite3
+
+# Editör ayarları
+.vscode/
+.idea/
