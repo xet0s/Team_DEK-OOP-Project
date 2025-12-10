@@ -3,3 +3,5 @@ Peewee>=3.17.0
 #Arayüz Kütüphanes
 PyQt6>=6.6.1
 
+#Şifreleme aracı
+bcrypt
