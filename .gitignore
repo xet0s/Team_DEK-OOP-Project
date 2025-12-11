@@ -15,7 +15,3 @@ venv/
 # Editör ayarları
 .vscode/
 .idea/
-
-#test dosyası
-test_main.py
-.gitignore

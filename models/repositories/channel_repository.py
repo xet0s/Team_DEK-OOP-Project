@@ -1,4 +1,4 @@
-from accounts_module.channel_base import ChannelModel
+from models.accounts_module.channel_base import ChannelModel
 from peewee import DoesNotExist 
 #Database e veri gönderecek ana sınıf
 class ChannelRepository:
@@ -29,3 +29,12 @@ class ChannelRepository:
         except DoesNotExist:
             print("Aranan statüde bir kanal bulunmamakta")
             return None
+    #Varolan kanalı ID'si sayesinde silme
+    def delete_channel(self,channel_id):
+        channel=self.get_channel_by_id(channel_id)#ID'den kanalı çekme
+
+        if channel:
+            channel.delete_instance()#DB'den veri silen satır
+            return True#Veri Silindi
+        
+        return  False #Veri silinemedi veya bulunamadı
