@@ -2,7 +2,7 @@ import datetime
 from peewee import Model,DateTimeField
 from models.database import db
 
-class BaseModel(Model): #tÜM MODELLERİN MİRAS ALACAĞI ANA SINIF YAPISI
+class BaseModel(Model): #TÜM MODELLERİN MİRAS ALACAĞI ANA SINIF YAPISI
     
     created_at=DateTimeField(default=datetime.datetime.now)
     update_at=DateTimeField(default=datetime.datetime.now)

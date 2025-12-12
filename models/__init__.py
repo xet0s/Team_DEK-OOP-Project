@@ -4,7 +4,7 @@ from models.database import db
 # from models.accounts_module.channel import ...
 
 # from models.content_module.category import ...
-# from models.content_module.video import ...
+from models.content_module.video_base import VideoModel
 
 # from models.interaction_module.comment import ...
 # from models.interaction_module.like import ...
@@ -12,6 +12,6 @@ from models.database import db
 
 def create_tables(): #database deki tabloları oluşturmayı sağlayan fonksiyon
     with db:
-        pass
+        db.create_tables([VideoModel]) #Video Tablosu
 
     print("Veritabanı tabloları güncellendi")
