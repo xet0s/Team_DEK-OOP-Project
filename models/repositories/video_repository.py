@@ -1,4 +1,4 @@
-from content_module.video_base import VideoModel
+from models.content_module.video_base import VideoModel
 from peewee import DoesNotExist
 
 class VideoRepository:
@@ -13,7 +13,7 @@ class VideoRepository:
             return None
 
     def get_videos_by_channel(self, channel_id): #Kanal ID'sine göre videoları listeleme
-            return VideoModel.select().where(VideoModel.channel == channel_id)
+        return VideoModel.select().where(VideoModel.channel == channel_id)
 
     def get_all_videos(self): #Bütün videoları listeleme
         return list(VideoModel.select())
