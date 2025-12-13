@@ -36,10 +36,10 @@ class ShortVideo(VideoBase):
         super().__init__(model)
 
     def calculate_listing_score(self):
-        return random.randint(70, 100)  # Kısa videolar anlık tüketildiği için rastgele yüksek listeleme puanı
+        return random.randint(70, 100)          # Kısa videolar anlık tüketildiği için rastgele yüksek listeleme puanı
 
     def get_processing_time_estimate(self):
-        return 15                       # Kısa videolar için sabit işlenme süresi
+        return 15                               # Kısa videolar için sabit işlenme süresi
 
 
 class LiveStreamVideo(VideoBase):
@@ -48,13 +48,13 @@ class LiveStreamVideo(VideoBase):
 
     def calculate_listing_score(self):
         if self.data.status == 'published':
-            return 40   # Yayınlanan canlı yayınlar için düşük listeleme puanı
-        return 99       # Güncel canlı yayınlar için yüksek listeleme puanı
+            return 40                           # Yayınlanan canlı yayınlar için düşük listeleme puanı
+        return 99                               # Güncel canlı yayınlar için yüksek listeleme puanı
 
     def get_processing_time_estimate(self):
-        return 0        # Canlı yayınlar anlık işlendiği için işlenme süresi yok
+        return 0                                # Canlı yayınlar anlık işlendiği için işlenme süresi yok
 
-def get_video_logic(model): # Veritabanından çekilen modele göre doğru video tipini döndüren fabrika fonksiyonu
+def get_video_logic(model):                     # Veritabanından çekilen modele göre doğru video tipini döndüren fabrika fonksiyonu
     if model.video_type_id == 'short':
         return ShortVideo(model)
     elif model.video_type_id == 'live':
