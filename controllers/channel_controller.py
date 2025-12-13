@@ -1,9 +1,9 @@
 from models.accounts_module.channel_base import ChannelModel
 
 from models.accounts_module.channel_type import(
-    PersonalChannel,
-    BrandChannel,
-    KidChannel)
+                                                PersonalChannel,
+                                                BrandChannel,
+                                                KidChannel)
 
 from models.repositories.channel_repository import ChannelRepository
 
@@ -63,3 +63,31 @@ class ChannelController:
             return "Bu işlemi yapmak için gereken yetkiye sahip değilsiniz"
         self.repo.delete_channel(channel_id) #siler
         return "Kanal başarıyla silindi"
+    
+    def update_existing_channel(self,channel_id,current_user,updated_channel_name=None,updated_status=None):
+        
+        channel=self.repo.get_channel_by_id(channel_id) #Id üzerinden kanalı çeker
+
+        if channel is None:                             #kanalın varlığını kontrol eder
+            return "Bu id'ye sahip bir kanal bulunmamakta!"
+
+        if channel.channel_owner.id != current_user.id: #Kanal sahibi ile mevcut kullanıcı aynı kişi mi diye kontrol eder
+            return "Mevcut kanal üzerinde değişiklik yapacak yetkiniz bulunmamakta!"
+        
+        updated_information={}                          #değişikliklerin işleneceği boş kume
+
+        if updated_channel_name != None:                #Değiştirilecek isim girilmişse değişim  yapar
+            updated_information["channel_name"]=updated_channel_name
+            
+        if updated_status != None:                      #Değiştirilicek durum girildiyse değişim yapar
+            updated_information["channel_status"]=updated_status
+
+        if updated_information=={}:                     #Değişiklik kontrolü
+            return "Değişiklik yapılmadı"
+        
+        is_updated=self.repo.update_channel(channel_id,updated_information)#Başarı durumunu sorgular
+
+        if is_updated:
+            return "Kanal Başarı ile güncellendi"
+        else:
+            return "Güncelleme esnasında bir hata oluştu"

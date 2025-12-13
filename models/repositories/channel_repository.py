@@ -38,3 +38,11 @@ class ChannelRepository:
             return True#Veri Silindi
         
         return  False #Veri silinemedi veya bulunamadı
+    
+    def update_channel(self,channel_id,updated_information):
+        #Değiştirme ve nerede değişiklik yapılacağı sorgusu
+        query=ChannelModel.update(**updated_information).where(ChannelModel.id==channel_id)
+        #Değişen satır sayısı
+        changed_row_num=query.execute()
+
+        return changed_row_num>0

@@ -35,7 +35,6 @@ sonuc_mesaji = controller.create_channel(
     channel_owner=user,
     channel_name="Python Eğitim Kampı",
     channel_category="Education",
-    channel_status="active", 
     channel_type="Personal"  # Burayı 'Brand' veya 'Kid' yapıp limitin değiştiğini görebilirsin
 )
 
