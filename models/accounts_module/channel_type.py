@@ -2,8 +2,7 @@ from .channel_base import ChannelModel
 from abc import ABC, abstractmethod
 
 class ChannelBase(ABC):
-    def __init__(self,model):
-        self.data=model
+
     
     #calculate_visibility_score --> Kanalın görünürlük parametresi
     #get_upload_limit-------------> Kanala içerik yükleme limiti
@@ -15,10 +14,18 @@ class ChannelBase(ABC):
     @abstractmethod
     def get_upload_limit(self):
         pass
+    
+    @staticmethod
+    def get_channel_policy(channel_type_string):
+        if channel_type_string=="Personal":
+            return PersonalChannel()
+        if channel_type_string=="Brand":
+            return BrandChannel()
+        if channel_type_string=="Kid":
+            return KidChannel()
+        return PersonalChannel()
 
 class PersonalChannel(ChannelBase):
-    def __init__(self, model):
-        super().__init__(model)
 
     def calculate_visibility_score(self):
         return 10
@@ -27,8 +34,6 @@ class PersonalChannel(ChannelBase):
         return 5
     
 class BrandChannel(ChannelBase):
-    def __init__(self, model):
-        super().__init__(model)
 
     def calculate_visibility_score(self):
         return 7
@@ -37,8 +42,6 @@ class BrandChannel(ChannelBase):
         return 999
     
 class KidChannel(ChannelBase):
-    def __init__(self, model):
-        super().__init__(model)
 
     def calculate_visibility_score(self):
         return 5
