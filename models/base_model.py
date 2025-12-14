@@ -15,3 +15,4 @@ class BaseModel(Model): #TÜM MODELLERİN MİRAS ALACAĞI ANA SINIF YAPISI
         database=db
 
         
+
