@@ -1,3 +1,5 @@
+import string
+import random
 from models.accounts_module.channel_base import ChannelModel
 from models.content_module.video_base import VideoModel
 from models.repositories.channel_repository import ChannelRepository
@@ -39,6 +41,9 @@ class VideoController:
         existing_videos = self.repo.get_videos_by_channel(channel.id)
         if len(existing_videos) >= channel_logic.get_upload_limit():
             return f"Yükleme limiti aşıldı! Limit: {channel_logic.get_upload_limit()}"
+        
+        #Rastgele video linki oluşturma
+        link = self.generate_video_link()
 
         #Kaydedilecek video bilgileri
         video_information={
@@ -48,7 +53,8 @@ class VideoController:
             "duration_seconds": video_duration, 
             "video_type_id": db_video_type,  
             "status": "uploaded",
-            "visibility": "public"
+            "visibility": "public",
+            "video_link": link
         }
 
         #Kayıt işlemi
@@ -68,9 +74,15 @@ class VideoController:
         processing_time = prepared_video.get_processing_time_estimate()
 
         return f""" 
-                    Video Uploader: {saved_video.channel.channel_name}|Video Title: {saved_video.title}
-                    Video Description: {saved_video.description}|Video Type: {db_video_type} 
-                    Video Status: {saved_video.status}| Tahmini İşleme Süresi: {processing_time} saniye"""
+        Video Başarıyla Yüklendi!
+        -------------------------
+        Kanal: {saved_video.channel.channel_name}
+        Başlık: {saved_video.title}
+        Link: {saved_video.video_link}
+        Açıklama: {saved_video.description}
+        Tür: {db_video_type} 
+        Durum: {saved_video.status}
+        Tahmini İşleme Süresi: {processing_time} saniye"""
 
     #Video silme fonksiyonu
     def delete_existing_video(self,video_id,current_user):
@@ -120,3 +132,9 @@ class VideoController:
                     """
         else:
             return "Video güncellenemedi"
+
+    #Yardımcı fonksiyon: Rastgele video linki oluşturma
+    def generate_video_link(self):
+        chars = string.ascii_letters + string.digits
+        random_link = ''.join(random.choice(chars) for _ in range(8)) #Uzunluk 8 karakter
+        return f"https://dek.video/v/{random_link}"
