@@ -1,7 +1,7 @@
 import sys
 import os
 
-# Dosya yolunu ekle
+# Proje ana dizinini Python yoluna ekle
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from models.database import db
@@ -10,40 +10,36 @@ from models.accounts_module.channel_base import ChannelModel
 from models.content_module.video_base import VideoModel
 from controllers.video_controller import VideoController
 
-#DB Bağlantısı ve Tablolar
+# Veritabanını Hazırla
 db.connect()
-db.drop_tables([User, ChannelModel, VideoModel]) 
 db.create_tables([User, ChannelModel, VideoModel])
 
 print("--- 🎬 VİDEO OLUŞTURMA, LİNK VE LİMİT TESTİ BAŞLIYOR ---")
 
-# 1. Kullanıcı Oluştur
+# Kullanıcı Oluştur
 user = User.create(
     username="TestYonetmeni", 
     email="director@test.com", 
     password_hash="123"
 )
 
-# 2. Kanal Oluştur
+# Kanal Oluştur
+print(">> Kanal oluşturuluyor...")
 channel = ChannelModel.create(
     channel_owner=user,
     channel_name="Minik Dahiler",
     channel_category="Education",
     channel_type="Kid",
-    channel_status="active"
+    channel_status="active",
+    channel_upload_limit=2,
 )
+print(f"✅ Kanal Hazır: {channel.channel_name} (Limit: {channel.channel_upload_limit})")
 
-try:
-    channel.upload_limit = 2 # Kid kanalı limiti
-    channel.save()
-    print(f"✅ Kanal Hazır: {channel.channel_name} (Limit: {channel.upload_limit})")
-except:
-    print("⚠️ Uyarı: ChannelModel'de 'upload_limit' alanı henüz yok. Limit testi pas geçilebilir.")
 
-# 3. Controller Başlat
+# Controller Başlat
 video_controller = VideoController()
 
-# Test 1: Standart Video Oluşturma
+# Test 1: Standard Video Oluşturma ve Link Kontrolü
 print("\n--- [TEST 1] İlk Video (Standard) ---")
 sonuc1 = video_controller.create_video(
     current_user=user,

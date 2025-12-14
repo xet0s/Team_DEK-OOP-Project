@@ -31,16 +31,10 @@ class VideoController:
             return "Bu kanala video yükleme yetkiniz yoktur."
 
         #Yükleme limiti kontrolü
-        channel_logic = None
-        if channel.channel_type=="Personal":
-            channel_logic=PersonalChannel(channel)
-        if channel.channel_type=="Brand":
-            channel_logic=BrandChannel(channel)
-        if channel.channel_type=="Kid":
-            channel_logic=KidChannel(channel)
         existing_videos = self.repo.get_videos_by_channel(channel.id)
-        if len(existing_videos) >= channel_logic.get_upload_limit():
-            return f"Yükleme limiti aşıldı! Limit: {channel_logic.get_upload_limit()}"
+        limit = channel.channel_upload_limit
+        if len(existing_videos) >= limit:
+            return f"Yükleme limiti aşıldı! Limit: {limit}"
         
         #Rastgele video linki oluşturma
         link = self.generate_video_link()
