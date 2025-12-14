@@ -1,9 +1,10 @@
 from models.accounts_module.channel_base import ChannelModel
 
-from models.accounts_module.channel_type import(
+from models.accounts_module.channel_type import(ChannelBase,
                                                 PersonalChannel,
                                                 BrandChannel,
-                                                KidChannel)
+                                                KidChannel,
+                                                )
 
 from models.repositories.channel_repository import ChannelRepository
 
@@ -15,36 +16,29 @@ class ChannelController:
     #Kanal oluşumunu sağlayan fonksiyon.
     #Kanal oluşum kurallarını,şartlarını ve hata durumlarını içinde barındırır
     def create_channel(self,channel_owner,channel_name,channel_category,channel_type):
-        #Kanal Türleri
-        valid_types=["Personal","Brand","Kid"]
-        #Kontrol komutu
-        if channel_type not in valid_types:
-            return "Lütfen belirtilen kanal türlerden birini seçiniz !"
+        
+        #Kanal Türü belirleme ve türe göre sınıf ataması yapma
+        prepared_channel=ChannelBase.get_channel_policy(channel_type)
+        #Limit Belirleme
+        upload_limit=prepared_channel.get_upload_limit()
+        #2. hata kontrol sistemi
+        if prepared_channel is None:
+            return "Hata! Kanal türü doğru şekilde belirlenemedi"
+        
         #Kayıt Şeması
         channel_information={
             "channel_owner":channel_owner,
             "channel_name":channel_name,
             "channel_category":channel_category,
-            "channel_type":channel_type
+            "channel_type":channel_type,
+            "channel_upload_limit":upload_limit,
         }
+
         #Halihazırda kayıtlı bir kanal girilmeye çalışılırsa uyarı vermesi için ayarlanmış sistem
         try:
             saved_channel=self.repo.add_channel(channel_information) #Kanal kayıt sistemi
         except Exception as e:
             return f"Veritabanı hatası: {str(e)}"
-        prepared_channel=None
-        #Kanal Türü belirleme ve türe göre sınıf ataması yapma
-        if channel_type=="Personal":
-            prepared_channel=PersonalChannel(saved_channel)
-        elif channel_type=="Brand":
-            prepared_channel=BrandChannel(saved_channel)
-        elif channel_type=="Kid":
-            prepared_channel=KidChannel(saved_channel)
-        #2. hata kontrol sistemi
-        if prepared_channel is None:
-            return "Hata! Kanal türü doğru şekilde belirlenemedi"
-        #Polimorfizm testi/Limit belirleme
-        upload_limit=prepared_channel.get_upload_limit()
         #Kanal bilgisi döndürme
         return f""" 
                     Channel Owner: {saved_channel.channel_owner.username}|Channel Name: {saved_channel.channel_name}
