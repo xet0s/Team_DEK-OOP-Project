@@ -1,2 +1,0 @@
-from models.interaction_module.interaction_base import InteractionModel
-from peewee import DoesNotExist,fn
