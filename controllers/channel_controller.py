@@ -23,13 +23,12 @@ class ChannelController:
 
         #hata kontrol sistemi
         if prepared_channel is None:
-            return "Hata! Kanal türü doğru şekilde belirlenemedi"
+            return (False,"Hata! Kanal türü doğru şekilde belirlenemedi")
         #Limit Belirleme
         upload_limit=prepared_channel.get_upload_limit()
         #Kanal linki oluşturma
         clean_channel_name=channel_name.replace(" ","").lower()
-        owner_id=channel_owner.id
-        created_channel_link=f"https://dek.video.com/c/{owner_id}/{clean_channel_name}/?s={random.randint(1000,9999)}"
+        created_channel_link=f"https://dek.video.com/c/{clean_channel_name}/?s={random.randint(1000,9999)}"
 
         #Kayıt Şeması
         channel_information={
@@ -44,9 +43,9 @@ class ChannelController:
         try:
             saved_channel=self.repo.add_channel(channel_information) #Kanal kayıt sistemi
         except Exception as e:
-            return f"Veritabanı hatası : {str(e)}"
+            return (False,f"Veritabanı hatası : {str(e)}")
         #Kanal bilgisi döndürme
-        return (
+        return (True,
 f"""
 ------------------------------------------
             [✓] KANAL OLUŞTURULDU
