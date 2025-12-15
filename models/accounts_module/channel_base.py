@@ -11,5 +11,6 @@ class ChannelModel(BaseModel):
     channel_status=CharField(default="pending_verification")#Kanal durumu
     channel_type=CharField(null=False)                      #Kanal Tipi
     channel_upload_limit=IntegerField(null=False)           #İçerik Yükleme Limiti
+    channel_link=CharField(unique=True,null=False)          #Kanal linki
     class Meta:                                             #Sql Tablosu
         table_name="channels"
