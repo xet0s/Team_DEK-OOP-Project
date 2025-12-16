@@ -12,6 +12,7 @@ class VideoModel(BaseModel):
     status = CharField(default='uploaded')                                  # Video durumu
     video_type_id = CharField(null=False)                                   # Video tipi ('standard', 'short', 'live')
     video_link = CharField(max_length=255, unique=True, null=False)         # Video bağlantısı
-    
+    video_category = CharField(default="General")                           # Video kategorisi
+    tags = CharField(null=True)                                             # Video etiketleri
     class Meta:                                                             # SQL Tablosu
         table_name = "videos"
