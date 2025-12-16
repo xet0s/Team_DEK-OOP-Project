@@ -2,11 +2,13 @@ from email import policy
 import string
 import random
 from models.accounts_module.user_type import UserBase
+from models.content_module.category_type import CategoryBase
 from models.accounts_module.channel_base import ChannelModel
 from models.content_module.video_base import VideoModel
 from models.repositories.channel_repository import ChannelRepository
 from models.repositories.video_repository import VideoRepository
 from models.content_module.video_type import get_video_logic
+from models.content_module.category_type import get_category_policy
 
 class VideoController:
     def __init__(self): #Repository klasörüne bağlantı
@@ -14,7 +16,7 @@ class VideoController:
         self.channel_repo=ChannelRepository()
 
     #Video oluşturma fonksiyonu
-    def create_video(self, current_user, channel_id, video_title, video_description, video_duration, video_type_input):
+    def create_video(self, current_user, channel_id, video_title, video_description, video_duration, video_type_input, video_category_input):
         user_policy = UserBase.get_user_policy(current_user.role, current_user)
         if not user_policy.upload_video():
             return "Video yükleme yetkiniz bulunmamaktadır."
@@ -38,6 +40,11 @@ class VideoController:
         if len(existing_videos) >= limit:
             return f"Yükleme limiti aşıldı! Limit: {limit}"
         
+        #Kategori mantığı belirleme
+        category_logic = get_category_policy(video_category_input)
+        auto_tags = category_logic.get_suggested_tags()
+        cat_desc = category_logic.get_category_description()
+
         #Rastgele video linki oluşturma
         link = self.generate_video_link()
 
@@ -45,9 +52,11 @@ class VideoController:
         video_information={
             "channel": channel,              
             "title": video_title,            
-            "description": video_description,
+            "description": video_description + "\n\nKategori Açıklaması: " + cat_desc + "\nTags: " + auto_tags,
             "duration_seconds": video_duration, 
-            "video_type_id": db_video_type,  
+            "video_type_id": db_video_type,
+            "video_category": video_category_input,
+            "tags": auto_tags,
             "status": "uploaded",
             "visibility": "public",
             "video_link": link

@@ -72,3 +72,9 @@ class VideoRepository:
             return VideoModel.select().order_by(VideoModel.created_at.desc())
         else:
             return VideoModel.select().order_by(VideoModel.created_at.asc())
+        
+    def filter_by_category(self, category_name):
+        try:
+            return list(VideoModel.select().where(VideoModel.video_category == category_name))
+        except DoesNotExist:
+            return []
