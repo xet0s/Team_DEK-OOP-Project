@@ -1,11 +1,7 @@
 import random
 
 from models.accounts_module.channel_base import ChannelModel
-from models.accounts_module.channel_type import(ChannelBase,
-                                                PersonalChannel,
-                                                BrandChannel,
-                                                KidChannel,
-                                                )
+from models.accounts_module.channel_type import ChannelBase
 
 from models.repositories.channel_repository import ChannelRepository
 
@@ -18,6 +14,10 @@ class ChannelController:
     #Kanal oluşum kurallarını,şartlarını ve hata durumlarını içinde barındırır
     def create_channel(self,channel_owner,channel_name,channel_category,channel_type):
         
+        existing_channel= self.repo.get_channel_by_owner(channel_owner.id)
+
+        if existing_channel != None:
+            return(False,f"HATA: Sayın {channel_owner.username} zaten {existing_channel.channel_name} adında bir kanalınız var! İkinci kanalı açamazsınız.")
         #Kanal Türü belirleme ve türe göre sınıf ataması yapma
         prepared_channel=ChannelBase.get_channel_policy(channel_type)
 
