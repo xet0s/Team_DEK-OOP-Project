@@ -1,14 +1,12 @@
+from email import policy
 import string
 import random
+from models.accounts_module.user_type import UserBase
 from models.accounts_module.channel_base import ChannelModel
 from models.content_module.video_base import VideoModel
 from models.repositories.channel_repository import ChannelRepository
 from models.repositories.video_repository import VideoRepository
 from models.content_module.video_type import get_video_logic
-from models.accounts_module.channel_type import(
-                                                PersonalChannel,
-                                                BrandChannel,
-                                                KidChannel)
 
 class VideoController:
     def __init__(self): #Repository klasörüne bağlantı
@@ -17,6 +15,10 @@ class VideoController:
 
     #Video oluşturma fonksiyonu
     def create_video(self, current_user, channel_id, video_title, video_description, video_duration, video_type_input):
+        user_policy = UserBase.get_user_policy(current_user.role, current_user)
+        if not user_policy.upload_video():
+            return "Video yükleme yetkiniz bulunmamaktadır."
+        
         type_mapping = {"Standard": "standard", "Short": "short", "LiveStream": "live"} #Kullanıcıdan alınan video türünü veritabanı türüne eşleme
         #Geçerlilik kontrolü
         if video_type_input not in type_mapping:
@@ -66,25 +68,29 @@ class VideoController:
             return "Hata! Video türü doğru şekilde belirlenemedi"
 
         processing_time = prepared_video.get_processing_time_estimate()
+        process_msg = self.simulate_video_processing(saved_video.id)
+        final_video = self.repo.get_video_by_id(saved_video.id)
 
         return f""" 
         Video Başarıyla Yüklendi!
         -------------------------
-        Kanal: {saved_video.channel.channel_name}
-        Başlık: {saved_video.title}
-        Link: {saved_video.video_link}
-        Açıklama: {saved_video.description}
+        Kanal: {final_video.channel.channel_name}
+        Başlık: {final_video.title}
+        Link: {final_video.video_link}
+        Açıklama: {final_video.description}
         Tür: {db_video_type} 
-        Durum: {saved_video.status}
-        Tahmini İşleme Süresi: {processing_time} saniye"""
+        Durum: {final_video.status}
+        Sistem Mesajı: {process_msg}
+        İşleme Süresi: {processing_time} saniye"""
 
     #Video silme fonksiyonu
     def delete_existing_video(self,video_id,current_user):
         #Video varlık ve yetki kontrolü
         video=self.repo.get_video_by_id(video_id)
+        user_policy = UserBase.get_user_policy(current_user.role, current_user)
         if video is None:
             return "Böyle bir video bulunmamakta"
-        if video.channel.channel_owner.id != current_user.id:
+        if video.channel.channel_owner.id != current_user.id and not user_policy.has_admin_access():
             return "Bu videoyu silme yetkiniz yoktur"
 
         #Silme işlemi
@@ -98,9 +104,10 @@ class VideoController:
     def update_existing_video(self,video_id,current_user,new_title=None,new_description=None):
         #Video varlık ve yetki kontrolü
         video=self.repo.get_video_by_id(video_id)
+        user_policy = UserBase.get_user_policy(current_user.role, current_user)
         if video is None:
             return "Böyle bir video bulunmamakta"
-        if video.channel.channel_owner.id != current_user.id:
+        if video.channel.channel_owner.id != current_user.id and not user_policy.has_admin_access():
             return "Bu videoyu güncelleme yetkiniz yoktur"
 
         #Güncellenecek bilgiler
@@ -126,6 +133,65 @@ class VideoController:
                     """
         else:
             return "Video güncellenemedi"
+
+    #Video listesi şeklinde görüntüleme fonksiyonu
+    def list_all_videos(self):
+        videos = self.repo.get_all_videos()
+        if not videos:
+            return "Hiç video bulunmamaktadır."
+        
+        video_list = "Mevcut Videolar:\n"
+        for video in videos:
+            video_list += f"ID: {video.id}, Başlık: {video.title}, Kanal: {video.channel.channel_name}, Durum: {video.status}\n"
+        return video_list
+
+    #Duruma göre video listeleme fonksiyonu
+    def list_videos_by_status(self, status):
+        videos = self.repo.filter_by_status(status)
+        if not videos:
+            return f"'{status}' durumunda video bulunmamaktadır."
+        
+        video_list = f"'{status}' Durumundaki Videolar:\n"
+        for video in videos:
+            video_list += f"ID: {video.id}, Başlık: {video.title}, Kanal: {video.channel.channel_name}\n"
+        return video_list
+
+    #Görünürlüğe göre video listeleme fonksiyonu
+    def list_videos_by_visibility(self, visibility):
+        videos = self.repo.filter_by_visibility(visibility)
+        if not videos:
+            return f"'{visibility}' görünürlüğünde video bulunmamaktadır."
+        
+        video_list = f"'{visibility}' Görünürlüğündeki Videolar:\n"
+        for video in videos:
+            video_list += f"ID: {video.id}, Başlık: {video.title}, Kanal: {video.channel.channel_name}\n"
+        return video_list
+
+    #Tarihe göre sıralanmış video listeleme fonksiyonu
+    def list_recent_videos(self):
+        videos = self.repo.get_sorted_videos_by_date()
+        if not videos:
+            return "Hiç video bulunmamaktadır."
+        
+        video_list = "Son Yüklenen Videolar:\n"
+        for video in videos:
+            video_list += f"ID: {video.id}, Başlık: {video.title}, Kanal: {video.channel.channel_name}, Yüklenme Tarihi: {video.created_at}\n"
+        return video_list
+
+    #Video işleme simülasyonu
+    def simulate_video_processing(self,video_id):
+        video=self.repo.get_video_by_id(video_id)
+        if video is None:
+            return "Böyle bir video bulunmamakta"
+        
+        video_logic=get_video_logic(video)
+        if video_logic is None:
+            return "Video türü belirlenemediği için işleme yapılamıyor"
+        
+        wait_time=video_logic.get_processing_time_estimate()
+        self.repo.update_video_status(video_id,"published")
+
+        return f"Video işleme {wait_time} saniye içinde tamamlandı. Yeni durum: {video_logic.data.status}"
 
     #Yardımcı fonksiyon: Rastgele video linki oluşturma
     def generate_video_link(self):

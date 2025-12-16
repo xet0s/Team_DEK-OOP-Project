@@ -22,14 +22,6 @@ class VideoRepository:
     def get_all_videos(self):
         return list(VideoModel.select())
 
-    #Kategoriye göre videoları listeleme
-    def filter_by_category(self, category_name): 
-        try:
-            return VideoModel.select().where(VideoModel.video_category == category_name)
-        except DoesNotExist:
-            print("Aranan kategoride video bulunmamakta")
-            return None
-
     #Video durumunu güncelleme
     def update_video_status(self, video_id, new_status):
         video = self.get_video_by_id(video_id)
@@ -44,10 +36,10 @@ class VideoRepository:
     #Video durumuna göre videoları listeleme
     def filter_by_status(self, status):
         try:
-            return VideoModel.select().where(VideoModel.status == status)
+            return list(VideoModel.select().where(VideoModel.status == status))
         except DoesNotExist:
             print("Aranan statüde bir video bulunmamakta")
-            return None
+            return []
 
     #Video silme
     def delete_video(self, video_id):
@@ -65,3 +57,18 @@ class VideoRepository:
         query = VideoModel.update(**updated_information).where(VideoModel.id == video_id)
         changed_row_num = query.execute()
         return changed_row_num > 0
+
+    #Görünürlüğe göre videoları listeleme
+    def filter_by_visibility(self, visibility):
+        try:
+            return VideoModel.select().where(VideoModel.visibility == visibility)
+        except DoesNotExist:
+            print("Aranan görünürlükte bir video bulunmamakta")
+            return []
+
+    #Tarihe göre videoları sıralama
+    def get_sorted_videos_by_date(self, descending=True):
+        if descending:
+            return VideoModel.select().order_by(VideoModel.created_at.desc())
+        else:
+            return VideoModel.select().order_by(VideoModel.created_at.asc())

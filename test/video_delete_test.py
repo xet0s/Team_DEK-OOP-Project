@@ -1,5 +1,6 @@
 import sys
 import os
+from time import sleep
 
 # Proje ana dizinini Python yoluna ekle
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -12,13 +13,21 @@ from controllers.video_controller import VideoController
 
 # Veritabanını Hazırla
 db.connect()
+db.drop_tables([User, ChannelModel, VideoModel])
 db.create_tables([User, ChannelModel, VideoModel])
 
-print("--- 🗑️ VİDEO SİLME VE GÜVENLİK TESTİ BAŞLIYOR ---")
+print("--- VİDEO SİLME VE GÜVENLİK TESTİ ---")
+print("-" * 50)
 
 # Kullanıcıları ve Videoları Oluştur, Controlleri Başlat
-owner = User.create(username="Sahip", email="sahip@test.com", password_hash="123")
-hacker = User.create(username="Hacker", email="hacker@test.com", password_hash="123")
+owner = User.create(username="Sahip",
+                    email="sahip@test.com",
+                    password_hash="123",
+                    role="Standard")
+hacker = User.create(username="Hacker",
+                    email="hacker@test.com",
+                    password_hash="123",
+                    role="Standard")
 
 channel = ChannelModel.create(
     channel_owner=owner,
@@ -41,6 +50,7 @@ controller.create_video(
     video_duration=300,
     video_type_input="Standard"
 )
+sleep(0.75)
 
 # Oluşturulan videonun ID'sini al
 video = VideoModel.select().first()
@@ -56,12 +66,14 @@ sonuc1 = controller.delete_existing_video(
     current_user=hacker 
 )
 print("SONUÇ:", sonuc1)
+sleep(0.75)
 
 check_video = VideoModel.get_or_none(VideoModel.id == video_id)
 if "yetkiniz yoktur" in str(sonuc1) and check_video is not None:
-    print("✅ BAŞARILI: Sistem hacker'ı engelledi, video hala duruyor.")
+    print("BAŞARILI: Sistem hacker'ı engelledi, video hala duruyor.")
 else:
-    print("❌ HATA: Hacker videoyu sildi veya mesaj yanlış!")
+    print("HATA: Hacker videoyu sildi veya mesaj yanlış!")
+sleep(0.75)
 
 # Test 2: Sahip Silme Denemesi
 print("\n--- [TEST 2] Sahip Silmeye Çalışıyor ---")
@@ -70,12 +82,14 @@ sonuc2 = controller.delete_existing_video(
     current_user=owner 
 )
 print("SONUÇ:", sonuc2)
+sleep(0.75)
 
 deleted_video = VideoModel.get_or_none(VideoModel.id == video_id)
 if deleted_video is None:
-    print("✅ BAŞARILI: Video veritabanından tamamen silindi.")
+    print("BAŞARILI: Video veritabanından tamamen silindi.")
 else:
-    print("❌ HATA: Video hala veritabanında duruyor!")
+    print("HATA: Video hala veritabanında duruyor!")
+sleep(0.75)
 
 # Test 3: Aynı Videoyu Tekrar Silme Denemesi
 print("\n--- [TEST 3] Aynı Videoyu Tekrar Silme Denemesi ---")
@@ -84,10 +98,11 @@ sonuc3 = controller.delete_existing_video(
     current_user=owner
 )
 print("SONUÇ:", sonuc3)
+sleep(0.75)
 
 if "bulunmamakta" in str(sonuc3):
-    print("✅ BAŞARILI: Sistem olmayan videoyu yönetti.")
+    print("BAŞARILI: Sistem olmayan videoyu yönetti.")
 else:
-    print("❌ HATA: Beklenmedik bir cevap döndü.")
+    print("HATA: Beklenmedik bir cevap döndü.")
 
 print("\n--- TEST BİTTİ ---")
