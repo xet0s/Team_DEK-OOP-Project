@@ -14,7 +14,7 @@ class ChannelRepository:
             return None
     #Kullanıcı ID si üzerinden kanal durumunu kontrol eden sistem
     def get_channel_by_owner(self,owner_id):
-        return ChannelModel.get_or_none(ChannelModel.channel_owner ==owner_id).first()
+        return ChannelModel.get_or_none(ChannelModel.channel_owner ==owner_id)
 
     #Bütün kanalları listeleme
     def get_all_channel(self):
