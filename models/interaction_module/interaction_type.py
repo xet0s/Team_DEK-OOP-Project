@@ -40,7 +40,7 @@ class LikeInteraction(InteractionBase): #beğenme kısmı
         
         if self.model.status == 'active':
             # Beğeniyi Geri Alma (Unlike)
-            self.model.status = 'deleted'
+            self.model.status = 'deactive'
             self.model.content = "Unliked"
             self.model.save()
             return "Beğenme Durumu: Beğeni Geri Alındı "
@@ -63,7 +63,7 @@ class DislikeInteraction(InteractionBase):
 
         if self.model.status=="active":
             #dislike geri alma
-            self.model.status="deleted"
+            self.model.status="deactive"
             self.model.content="Undislike"
             self.model.save()
             return "Beğenmeme Durumu:Dislike geri alındı"   
@@ -71,7 +71,7 @@ class DislikeInteraction(InteractionBase):
         else:
             #Dislike
             self.model.status="active"
-            self.model.conrent="disliked"
+            self.model.content="disliked"
             self.model.save()
             return "Beğenmeme Durumu:Video beğenilmedi"       
         
@@ -87,7 +87,7 @@ class SubscriptionInteraction(InteractionBase):
         
         if self.model.status == 'active':
             # Abonelikten Çıkma
-            self.model.status = 'deleted'
+            self.model.status = 'deactive'
             self.model.content = "Unsubscribed"
             self.model.save()
             return "Abonelik Durumu: Abonelikten Çıkıldı "
@@ -130,7 +130,7 @@ class SaveInteraction(InteractionBase):
 
         if self.model.status=="active":
             #Kaydı sil
-           self.model.status="deleted"
+           self.model.status="deactive"
            self.model.content=""     
            self.model.save()
            return "Kaydetme Durumu: Video kaydedilenlerden kaldırıldı"
@@ -141,6 +141,7 @@ class SaveInteraction(InteractionBase):
             self.model.content=""
             self.model.save()      
             return "Kaydetme Durumu:Video daha sonra izle listesine kaydedildi"
+
 
 def get_interaction_logic(model):
     """
