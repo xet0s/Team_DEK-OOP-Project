@@ -8,7 +8,7 @@ class User(BaseModel):
     username=CharField(unique=True,null=False)  
     email=CharField(unique=True,null=False)     
     password_hash=CharField(null=False)                   
-    
+    role= CharField(null=False)
     joined_at=DateTimeField(default=datetime.datetime.now)
     class Meta:  #SQL için Tablo ismi oluşturur
         table_name="users"

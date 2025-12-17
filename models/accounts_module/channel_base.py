@@ -1,4 +1,4 @@
-from peewee import CharField, ForeignKeyField
+from peewee import CharField, ForeignKeyField,IntegerField
 from models.base_model import BaseModel
 from models.accounts_module.user import User
 from abc import ABC, abstractmethod
@@ -10,5 +10,7 @@ class ChannelModel(BaseModel):
     channel_category=CharField(null=False)                  #Kanal kategorisi
     channel_status=CharField(default="pending_verification")#Kanal durumu
     channel_type=CharField(null=False)                      #Kanal Tipi
+    channel_upload_limit=IntegerField(null=False)           #İçerik Yükleme Limiti
+    channel_link=CharField(unique=True,null=True)           #Kanal linki
     class Meta:                                             #Sql Tablosu
         table_name="channels"
