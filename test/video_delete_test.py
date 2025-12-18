@@ -5,20 +5,20 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from models.database import db
-from models.accounts_module.user import User
+from models.accounts_module.user_base import UserModel
 from models.accounts_module.channel_base import ChannelModel
 from models.content_module.video_base import VideoModel
 from controllers.video_controller import VideoController
 
 # Veritabanını Hazırla
 db.connect()
-db.create_tables([User, ChannelModel, VideoModel])
+db.create_tables([UserModel, ChannelModel, VideoModel])
 
 print("--- 🗑️ VİDEO SİLME VE GÜVENLİK TESTİ BAŞLIYOR ---")
 
 # Kullanıcıları ve Videoları Oluştur, Controlleri Başlat
-owner = User.create(username="Sahip", email="sahip@test.com", password_hash="123")
-hacker = User.create(username="Hacker", email="hacker@test.com", password_hash="123")
+owner = UserModel.create(username="Sahip", email="sahip@test.com", password_hash="123")
+hacker = UserModel.create(username="Hacker", email="hacker@test.com", password_hash="123")
 
 channel = ChannelModel.create(
     channel_owner=owner,

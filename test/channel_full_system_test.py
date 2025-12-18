@@ -11,7 +11,7 @@ import time
 # --- MODÜL IMPORTLARI ---
 # Dosya yollarının projene uygun olduğundan emin ol
 try:
-    from models.accounts_module.user import User
+    from models.accounts_module.user_base import UserModel
     from models.accounts_module.channel_base import ChannelModel # Model adın farklıysa düzelt
     from controllers.user_controller import UserControl
     from controllers.channel_controller import ChannelController # Sınıf adını kontrol et
@@ -38,7 +38,7 @@ def run_full_simulation(user_count=5):
     print("==================================================\n")
 
     # 1. TEMİZLİK VE HAZIRLIK
-    User.create_table(safe=True)
+    UserModel.create_table(safe=True)
     ChannelModel.create_table(safe=True)
     
     user_ctrl = UserControl()
