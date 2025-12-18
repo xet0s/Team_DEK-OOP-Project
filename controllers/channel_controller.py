@@ -16,7 +16,7 @@ class ChannelController:
         self.repo=ChannelRepository()
     #Kanal oluşumunu sağlayan fonksiyon.
     #Kanal oluşum kurallarını,şartlarını ve hata durumlarını içinde barındırır
-    def create_channel(self,channel_owner,channel_name,channel_category,channel_type):
+    def create_channel(self,channel_owner,channel_name,channel_category,channel_type,channel_info=None):
         #Kanal var mı kontrolü
         existing_channel= self.repo.get_channel_by_owner(channel_owner.id)
         #Kanal varsa hata veren kısıms
@@ -48,6 +48,7 @@ class ChannelController:
             "channel_type":channel_type,
             "channel_upload_limit":upload_limit,
             "channel_link":created_channel_link,
+            "channel_info":channel_info,
         }
         #Halihazırda kayıtlı bir kanal girilmeye çalışılırsa uyarı vermesi için ayarlanmış sistem
         try:
@@ -80,7 +81,7 @@ Kanal Linki      : {saved_channel.channel_link}
             raise NotChannelOwnerError
         self.repo.delete_channel(channel_id) #siler
         return (True,"Kanal başarıyla silindi")
-    def update_existing_channel(self,channel_id,current_user,updated_channel_name=None,updated_status=None):
+    def update_existing_channel(self,channel_id,current_user,updated_channel_name=None,updated_status=None,updated_info=None):
         #Id üzerinden kanalı çeker
         channel=self.repo.get_channel_by_id(channel_id) 
         #kanalın varlığını kontrol eder
@@ -92,11 +93,13 @@ Kanal Linki      : {saved_channel.channel_link}
         #değişikliklerin işleneceği boş kume
         updated_information={}                          
         #Değiştirilecek isim girilmişse değişim  yapar
-        if updated_channel_name != None:                
+        if updated_channel_name != None:                 
             updated_information["channel_name"]=updated_channel_name
         #Değiştirilicek durum girildiyse değişim yapar
         if updated_status != None:                      
             updated_information["channel_status"]=updated_status
+        if updated_info != None:
+            updated_information["channel_info"]=updated_info
         #Değişiklik kontrolü
         if updated_information=={}:                     
             return (False,"Değişiklik yapılmadı")
