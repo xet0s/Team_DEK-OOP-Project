@@ -1,7 +1,7 @@
 from models.base_model import BaseModel
 import datetime
 from peewee import CharField,DateTimeField
-class UserModel(BaseModel):
+class User(BaseModel):
     #unique=True -->Benzersiz değişken
     #null=False  -->Boş bırakılamz değişken
 

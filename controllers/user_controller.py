@@ -1,6 +1,6 @@
 import bcrypt
 
-from models.accounts_module.user_base import UserModel
+from models.accounts_module.user import User
 from models.accounts_module.user_type import UserBase
 from models.repositories.user_repository import UserRepository
 from utils.exceptions.base_errors import MasterKeyError #Master key hatası

@@ -9,7 +9,7 @@ import random
 import string
 import time
 from controllers.user_controller import UserControl
-from models.accounts_module.user_base import UserModel
+from models.accounts_module.user import User
 
 # --- YARDIMCI ARAÇLAR ---
 def get_random_string(length=6):
@@ -23,7 +23,7 @@ def run_comprehensive_test(number_of_users=5):
     print("==================================================\n")
 
     # 1. Veritabanı Hazırlığı
-    UserModel.create_table(safe=True)
+    User.create_table(safe=True)
     controller = UserControl()
     
     success_count = 0
