@@ -1,5 +1,5 @@
-from models.playlist_module.playlist import PlaylistModel
-from models.playlist_module.playlist_item import PlaylistItemModel
+from models.interaction_module.playlist_base import PlaylistModel
+from models.interaction_module.playlist_type import PlaylistLogicBase
 from peewee import DoesNotExist   #Böyle bir kayıt yok hatsını yakalıcaz
 
 class PlaylistRepository:
@@ -30,13 +30,13 @@ class PlaylistRepository:
 
     def add_video_to_playlist(self,playlist,video): #Listeye video ekleme 
         #PlaylistItem tablosuna kayıt atar.
-        return PlaylistItemModel.create(playlist=playlist, video=video)
+        return PlaylistLogicBase.create(playlist=playlist, video=video)
 
     def remove_video_from_playlist(self,playlist_id,video_id): #videoyu listeden çıkarma
         try:
-            query = PlaylistItemModel.delete().where(
-                (PlaylistItemModel.playlist == playlist_id) &
-                (PlaylistItemModel.video == video_id)
+            query = PlaylistLogicBase.delete().where(
+                (PlaylistLogicBase.playlist == playlist_id) &
+                (PlaylistLogicBase.video == video_id)
             )
             return query.execute() # Silinen satır sayısını döner
         except Exception as e:
@@ -45,13 +45,13 @@ class PlaylistRepository:
 
     def get_playlist_items(self, playlist_id): #Listenin içindeki videoları getirme
         # O listeye ait tüm ara tablo kayıtlarını çeker
-        return list(PlaylistItemModel.select().where(PlaylistItemModel.playlist == playlist_id))
+        return list(PlaylistLogicBase.select().where(PlaylistLogicBase.playlist == playlist_id))
 
     def check_video_in_playlist(self, playlist_id, video_id): #Video listede var mı kontrolü
         try:
-            return PlaylistItemModel.select().where(
-                (PlaylistItemModel.playlist == playlist_id) &
-                (PlaylistItemModel.video == video_id)
+            return PlaylistLogicBase.select().where(
+                (PlaylistLogicBase.playlist == playlist_id) &
+                (PlaylistLogicBase.video == video_id)
             ).get()
         except DoesNotExist:
             # Eğer yoksa hata basmaya gerek yok, sadece None dönelim
