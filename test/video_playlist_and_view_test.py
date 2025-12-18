@@ -11,7 +11,7 @@ from models.accounts_module.channel_base import ChannelModel
 from models.content_module.video_base import VideoModel
 from models.interaction_module.interaction_base import InteractionModel
 from controllers.video_controller import VideoController
-from models.repositories.interaction_reporsitory import InteractionRepository
+from models.repositories.interaction_repository import InteractionRepository
 
 # Veritabanını Hazırla
 db.connect()
@@ -114,3 +114,20 @@ if "Test Video 1" in str(playlist_output) and "Test Video 3" in str(playlist_out
 else:
     print(">> HATA: Playlist yanlış oluşturuldu!")
 sleep(0.75)
+
+#Test 3: ID Listesi ile Video Getirme Testi
+print("\n--- [TEST 3] ID Listesi ile Video Getirme ---")
+id_list = interaction_repo.get_liked_video_ids_by_user(user.id)
+print(f" >> Kullanıcının beğendiği video ID'leri: {id_list}")
+sonuc_1 = video_controller.list_playlist_videos(id_list)
+print(">> Elde Edilen Videolar:")
+print(sonuc_1)
+
+if "Test Video 1" in str(sonuc_1) and "Test Video 3" in str(sonuc_1) and "Test Video 2" not in str(sonuc_1):
+    print(">> BAŞARILI: ID listesi ile doğru videolar getirildi!")
+else:
+    print(">> HATA: ID listesi ile yanlış videolar getirildi!")
+sleep(0.75)
+
+# Test 4: Playlist ID ile Video Getirme Testi
+#print("\n--- [TEST 4] Playlist ID ile Video Getirme ---")
