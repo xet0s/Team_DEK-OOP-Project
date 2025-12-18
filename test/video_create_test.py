@@ -38,6 +38,7 @@ channel = ChannelModel.create(
     channel_type="Kid",
     channel_status="active",
     channel_upload_limit=2,
+    channel_link="dek.channel/minikdahiler"
 )
 print(f"✅ Kanal Hazır: {channel.channel_name} (Limit: {channel.channel_upload_limit})")
 sleep(0.75)
@@ -53,7 +54,8 @@ sonuc1 = video_controller.create_video(
     video_title="Python Ders 1",
     video_description="Giriş",
     video_duration=120,
-    video_type_input="Standard"
+    video_type_input="Standard",
+    video_category_input="Education"
 )
 print(sonuc1)
 sleep(0.75)
@@ -77,7 +79,8 @@ sonuc2 = video_controller.create_video(
     video_title="Canlı Yayın",
     video_description="Test Yayını",
     video_duration=3600,
-    video_type_input="LiveStream"
+    video_type_input="LiveStream",
+    video_category_input="General"
 )
 print(sonuc2)
 sleep(0.75)
@@ -96,7 +99,8 @@ sonuc3 = video_controller.create_video(
     video_title="Yasaklı Video",
     video_description="Bu yüklenmemeli",
     video_duration=50,
-    video_type_input="Short"
+    video_type_input="Short",
+    video_category_input="Gaming"
 )
 print(sonuc3)
 sleep(0.75)
