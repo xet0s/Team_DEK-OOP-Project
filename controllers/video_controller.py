@@ -201,7 +201,28 @@ class VideoController:
         self.repo.update_video_status(video_id,"published")
 
         return f"Video işleme {wait_time} saniye içinde tamamlandı. Yeni durum: {video_logic.data.status}"
+    
+    #Video izleme fonksiyonu (izlenme sayısını artırma)
+    def watch_video(self, video_id):
+        video = self.repo.get_video_by_id(video_id)
+        if video is None:
+            return "Böyle bir video bulunmamaktadır."
+        
+        self.repo.increment_view_count(video_id)
+        updated_video = self.repo.get_video_by_id(video_id)
+        return f"Video izlendi. Yeni İzlenme Sayısı: {updated_video.view_count}"
+    
+    #Oynatma listesine göre video listeleme fonksiyonu
+    def list_playlist_videos(self, video_id_list):
+        videos = self.repo.get_videos_by_id_list(video_id_list)
 
+        if not videos:
+            return "Oynatma listesinde video bulunmamaktadır."
+        result = f"--- Playlist İçeriği ({len(videos)}) ---\n"
+        for v in videos:
+            result += f"{v.title} | İzlenme: {v.view_count} | Kategori: {v.video_category}\n"
+        return result
+    
     #Yardımcı fonksiyon: Rastgele video linki oluşturma
     def generate_video_link(self):
         chars = string.ascii_letters + string.digits

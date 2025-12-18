@@ -14,5 +14,6 @@ class VideoModel(BaseModel):
     video_link = CharField(max_length=255, unique=True, null=False)         # Video bağlantısı
     video_category = CharField(default="General")                           # Video kategorisi
     tags = CharField(null=True)                                             # Video etiketleri
+    view_count = IntegerField(default=0)                                    # Video görüntülenme sayısı
     class Meta:                                                             # SQL Tablosu
         table_name = "videos"

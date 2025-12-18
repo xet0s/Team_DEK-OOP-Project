@@ -49,7 +49,8 @@ res = controller.create_video(
     video_title="Eski Başlık",
     video_description="Eski Açıklama",
     video_duration=100,
-    video_type_input="Standard"
+    video_type_input="Standard",
+    video_category_input="General"
 )
 sleep(0.75)
 

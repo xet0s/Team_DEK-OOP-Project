@@ -72,9 +72,25 @@ class VideoRepository:
             return VideoModel.select().order_by(VideoModel.created_at.desc())
         else:
             return VideoModel.select().order_by(VideoModel.created_at.asc())
-        
+
+    #Kategoriye göre videoları filtreleme
     def filter_by_category(self, category_name):
         try:
             return list(VideoModel.select().where(VideoModel.video_category == category_name))
         except DoesNotExist:
+            return []
+        
+    #İzlenme sayısı arttırma
+    def increment_view_count(self, video_id):
+        query = VideoModel.update(view_count=VideoModel.view_count + 1).where(VideoModel.id == video_id)
+        return query.execute() > 0
+
+    #Oynatma listesine göre videoları listeleme
+    def get_videos_by_id_list(self, video_id_list):
+        if not video_id_list:
+            return []
+        try:
+            return list(VideoModel.select().where(VideoModel.id.in_(video_id_list)))
+        except DoesNotExist:
+            print("Bu oynatma listesinde video bulunmamaktadır.")
             return []
