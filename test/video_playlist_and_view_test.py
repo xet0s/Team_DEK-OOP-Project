@@ -117,7 +117,7 @@ sleep(0.75)
 
 #Test 3: ID Listesi ile Video Getirme Testi
 print("\n--- [TEST 3] ID Listesi ile Video Getirme ---")
-id_list = interaction_repo.get_liked_video_ids_by_user(user.id)
+id_list = interaction_repo.get_liked_videos_by_ids_by_user(user.id)
 print(f" >> Kullanıcının beğendiği video ID'leri: {id_list}")
 sonuc_1 = video_controller.list_playlist_videos(id_list)
 print(">> Elde Edilen Videolar:")
