@@ -26,6 +26,7 @@ class AccountModuleMasterTest:
         self.owner_user=None
         self.hacker_user=None
         self.test_channel_id=None
+        self.active_channel_owner = None
     #Test için ayrı bir veritabanı kurar
     def setup_database(self):
         """
@@ -120,6 +121,7 @@ class AccountModuleMasterTest:
                 saved_channel=ChannelModel.get(ChannelModel.channel_name==ch_name)
                 if ch_type=="Personal":
                     self.test_channel_id=saved_channel.id
+                    self.active_channel_owner=temp_owner
                 if saved_channel.channel_upload_limit==expected_limit:
                     print(f"BAŞARILI! {ch_type} yükleme limiti doğru atandı. Yükleme limiti : {expected_limit}\n")
                     sleep(0.3)
@@ -151,10 +153,10 @@ class AccountModuleMasterTest:
             print(f"✅ BAŞARILI: Sistem yetkisiz işlemi engelledi. Yakalanan Mesaj: '{e}'\n")
         print("\nSenaryo: Yetkili kullanıcı (Sahip) isim değiştirmeye çalışıyor...\n")
         try:
-            new_name = "Resmi Güncel Kanal"
+            new_name = "Resmi Güncel İsim"
             self.controller.update_existing_channel(
-                channel_id=self.test_channel_id,
-                current_user=self.owner_user,
+                self.test_channel_id,
+                self.active_channel_owner,
                 updated_channel_name=new_name
             )
             
@@ -188,13 +190,13 @@ class AccountModuleMasterTest:
         #Yetkisiz silme testi
         print("\nSenaryo: Hacker kanalı silmeye çalışıyor...\n")
         res = self.controller.delete_existing_channel(self.test_channel_id, self.hacker_user)
-        if "yetki" in res.lower() or "değilsiniz" in res.lower():
+        if "yetki" in res or "değilsiniz" in res:
             print("\nBAŞARILI: Silme engellendi.")
         else:
             print(f"\nHATA: Hacker silmeyi başardı! Mesaj: {res}")
         #Yetkili silme testi
         print("\nSenaryo: Sahibi kanalı siliyor...\n")
-        res = self.controller.delete_existing_channel(self.test_channel_id, self.owner_user)
+        res = self.controller.delete_existing_channel(self.test_channel_id, self.active_channel_owner)
         #Varlık kontrolü
         try:
             ChannelModel.get_by_id(self.test_channel_id)

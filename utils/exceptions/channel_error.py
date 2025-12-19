@@ -52,12 +52,12 @@ class ChannelAlreadyExistError(DekSystemError):
 Sahiplik ve limit hataları
 """
 #Kanal sahibi kontrolü hatası
-class NotChannelOwnerError(DekSystemError):
-    def __init__(self, username,channel_name):
-        self.error_code = 3001 
-        self.timestamp = datetime.now() 
-        message=f"HATA! Sayın '{username}', {channel_name} isimli kanala erişim hakkınız yok!"
-        super().__init__(message)
+# class NotChannelOwnerError(DekSystemError):
+#     def __init__(self,):
+#         self.error_code = 3001 
+#         self.timestamp = datetime.now() 
+#         message=f"HATA! Sayın '{self.username}', {self.channel_name} isimli kanala erişim hakkınız yok!"
+#         super().__init__(message)
 #Kanal yükleme limiti hatası
 class ChannelUploadLimitError(DekSystemError):
     def __init__(self,channel_name,upload_limit):
