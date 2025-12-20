@@ -7,8 +7,6 @@ from utils.exceptions.channel_error import (
     InvalidChannelTypeError,
     ChannelNotFoundError,
     ChannelAlreadyExistError,
-    NotChannelOwnerError,
-    ChannelUploadLimitError
 )
 class ChannelController:
     #repository bağlantısı
@@ -36,7 +34,8 @@ class ChannelController:
         if prepared_channel is None:
             raise InvalidChannelTypeError(channel_type)
         #Limit Belirleme
-        upload_limit=prepared_channel.get_upload_limit()
+        upload_limit=prepared_channel.upload_limit
+        visibility_score=prepared_channel.upload_limit
         #Kanal linki oluşturma
         clean_channel_name=channel_name.replace(" ","").lower()
         created_channel_link=f"https://dek.video.com/c/{clean_channel_name}/?s={random.randint(1000,9999)}"
@@ -66,6 +65,7 @@ Kanal İsmi       : {saved_channel.channel_name}
 Kanal Kategorisi : {saved_channel.channel_category}
 Kanal Türü       : {saved_channel.channel_type}
 Yükleme Limiti   : {saved_channel.channel_upload_limit}
+Görünürlük Puanı : {visibility_score}
 Kanal Linki      : {saved_channel.channel_link}
 ------------------------------------------
 """)
@@ -78,7 +78,7 @@ Kanal Linki      : {saved_channel.channel_link}
             raise ChannelNotFoundError(channel_id=channel)
         #Kanal ile kullanıcı bağlantısı kurar
         if current_user.id!=channel.channel_owner.id:
-            raise NotChannelOwnerError
+            return False,"Yetkisiz deneme"
         self.repo.delete_channel(channel_id) #siler
         return (True,"Kanal başarıyla silindi")
     def update_existing_channel(self,channel_id,current_user,updated_channel_name=None,updated_status=None,updated_info=None):
@@ -89,7 +89,7 @@ Kanal Linki      : {saved_channel.channel_link}
             raise ChannelNotFoundError(channel_id=channel_id)
         #Kanal sahibi ile mevcut kullanıcı aynı kişi mi diye kontrol eder
         if channel.channel_owner.id != current_user.id: 
-            raise NotChannelOwnerError(current_user.username, channel.channel_name)
+            return False, "Kanal bulunamadı"
         #değişikliklerin işleneceği boş kume
         updated_information={}                          
         #Değiştirilecek isim girilmişse değişim  yapar
@@ -109,25 +109,22 @@ Kanal Linki      : {saved_channel.channel_link}
             return (True,"Kanal Başarı ile güncellendi")
         else:
             return (False,"Güncelleme esnasında bir hata oluştu")
-    def search_channels(self,search_key,search_type,keyword):
+    def search_channels(self,search_key,search_value):
         #Boş sonuç listesi
         result=[]
-        found_channels=None
         #arama türünü belirleyen kısım
-        if search_type=="name":
-            result=self.repo.search_by_name(keyword)
-        if search_type=="category":
-            result=self.repo.list_by_category(keyword)
-        if search_type=="type":
-            result=self.repo.list_by_tag(keyword)
+        if search_key=="name":
+            result=self.repo.search_by_name(search_value)
+        if search_key=="category":
+            result=self.repo.list_by_category(search_value)
+        if search_key=="type":
+            result=self.repo.list_by_tag(search_value)
         #Sonuç yoksa hata fırlatan kısım
         if not result:
-            if search_type=="name":
-                raise ChannelNotFoundError(channel_name=keyword)
-            else:
-                raise ChannelNotFoundError(channel_name=f"{search_type}:{keyword}")
+            if search_key=="name":
+                return False, "Kriterlere uygun kanal bulunamadı."
         #Sonuç
         output="="*50+f"ARAMA SONUÇLARI ({len(result)} Kanal bulundu)\n"+"="*50
         for ch in result:
             output+= f"ID: {ch.id}|İsim: {ch.channel_name:<20}|Kategori: {ch.channel_category}\n"+"-"*50
-        output+="="*50
+        return True,output
