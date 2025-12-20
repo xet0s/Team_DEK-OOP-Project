@@ -55,4 +55,16 @@ class PlaylistRepository:
             ).get()
         except DoesNotExist:
             # Eğer yoksa hata basmaya gerek yok, sadece None dönelim
-            return None          
+            return None
+        
+    def get_video_ids_list_for_controller(self, playlist_id):
+        """
+        Video Controller'ın 'list_playlist_videos' metodu için
+        sadece ID'lerden oluşan temiz bir liste hazırlar.
+        Örn: [1, 5, 9]
+        """
+        # Mevcut metodu kullanarak satırları çekiyoruz
+        items = self.get_playlist_items(playlist_id)
+        
+        # List Comprehension ile sadece video ID'lerini alıp liste yapıyoruz
+        return [item.video.id for item in items]
