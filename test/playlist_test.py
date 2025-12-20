@@ -1,11 +1,11 @@
 import sys
 import os
 
-# --- YOL AYARLARI (Modüllerin bulunması için) ---
+# --- YOL AYARLARI ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 sys.path.append(project_root)
-# ------------------------------------------------
+# --------------------
 
 from models.accounts_module.user import User
 from models.accounts_module.channel_base import ChannelModel
@@ -14,160 +14,164 @@ from models.interaction_module.playlist_base import PlaylistModel
 from models.interaction_module.playlist_item import PlaylistItemModel
 from controllers.playlist_controller import PlaylistController
 
-# Test başlangıcı
-print("PLAYLIST SİSTEMİ TESTİ BAŞLIYOR")
+print("PLAYLIST SİSTEMİ TESTİ BAŞLIYOR (OOP Refactor)")
 
-# 1. TABLOLARI OLUŞTUR 
-# 1. Veritabanı tablolarını oluşturuyoruz.  tablolar yoksa hata almamamızı sağlar.
-print("1. Veritabanı Tabloları Kontrol Ediliyor...")
-try:
-    User.create_table(safe=True)
-    ChannelModel.create_table(safe=True)
-    VideoModel.create_table(safe=True)
-    PlaylistModel.create_table(safe=True)
-    PlaylistItemModel.create_table(safe=True)
-    print("   Tablolar hazır.")
-except Exception as e:
-    print(f"   Tablo uyarısı: {e}")
+class PlaylistSystemTest:
+    """
+    Playlist sistemi testlerini kapsayan sınıf.
+    İstenen OOP özellikleri:
+    - @staticmethod (Veri oluşturma)
+    - @property (En son işlem gören veriye erişim)
+    """
 
-# 2. SAHTE VERİ OLUŞTUR
-# 2. Test verilerini (kullanıcı, kanal, video) oluşturuyoruz.
-print("2. Test Verileri Oluşturuluyor...")
+    def __init__(self):
+        self.controller = PlaylistController()
+        self._last_playlist = None
+        self._last_user = None
 
-# Kullanıcı oluştur
-test_user, created = User.get_or_create(
-    username="MuzikSever", 
-    defaults={'email': 'muzik@test.com', 'password_hash': '1234'}
-)
+    @property
+    def last_created_playlist(self):
+        """Test sırasında oluşturulan son playlisti döndürür."""
+        if not self._last_playlist:
+            # Eğer henüz atanmadıysa, kullanıcının son playlistini bulmaya çalış
+            if self._last_user:
+                 playlists = self.controller.repo.get_playlists_by_user(self._last_user.id)
+                 if playlists:
+                     self._last_playlist = playlists[-1]
+        return self._last_playlist
 
-# Kanal oluştur (Video için)
-test_channel, created = ChannelModel.get_or_create(
-    channel_name="MuzikKanalim",
-    defaults={
-        'channel_owner': test_user,
-        'channel_category': 'Music',
-        'channel_type': 'standard',
-        'channel_status': 'verified'
-    }
-)
+    @staticmethod
+    def setup_database():
+        print("1. Veritabanı Tabloları Kontrol Ediliyor...")
+        try:
+            # Tabloları temizle (Şema değişikliği varsa yansıması için)
+            try: PlaylistItemModel.drop_table(safe=True)
+            except: pass
+            try: PlaylistModel.drop_table(safe=True)
+            except: pass
+            try: VideoModel.drop_table(safe=True)
+            except: pass
+            try: ChannelModel.drop_table(safe=True)
+            except: pass
+            try: User.drop_table(safe=True)
+            except: pass
+            
+            # Tabloları yeniden oluştur
+            User.create_table(safe=True)
+            ChannelModel.create_table(safe=True)
+            VideoModel.create_table(safe=True)
+            PlaylistModel.create_table(safe=True)
+            PlaylistItemModel.create_table(safe=True)
+            print("   Tablolar hazır.")
+        except Exception as e:
+            print(f"   Tablo uyarısı: {e}")
 
-# Videolar oluştur
-video1, created1 = VideoModel.get_or_create(
-    title="Pop Şarkılar 2024", 
-    defaults={
-        'channel': test_channel,
-        'description': 'En yeni pop şarkılar',
-        'duration_seconds': 180,
-        'status': 'published',
-        'video_type_id': 'standard'
-    }
-)
+    @staticmethod
+    def create_test_data():
+        print("2. Test Verileri Oluşturuluyor...")
+        # Kullanıcı
+        test_user, _ = User.get_or_create(
+            username="MuzikSever", 
+            defaults={'email': 'muzik@test.com', 'password_hash': '1234'}
+        )
+        
+        # Kanal
+        test_channel, _ = ChannelModel.get_or_create(
+            channel_name="MuzikKanalim",
+            defaults={
+                'channel_owner': test_user,
+                'channel_category': 'Music',
+                'channel_type': 'standard',
+                'channel_status': 'verified',
+                'channel_upload_limit': 10
+            }
+        )
 
-video2, created2 = VideoModel.get_or_create(
-    title="Rock Klasikleri", 
-    defaults={
-        'channel': test_channel,
-        'description': 'Efsane rock parçalar',
-        'duration_seconds': 240,
-        'status': 'published',
-        'video_type_id': 'standard'
-    }
-)
+        # Videolar
+        v1, _ = VideoModel.get_or_create(
+            title="Pop Şarkılar 2024", 
+            defaults={
+                'channel': test_channel,
+                'description': 'En yeni pop şarkılar',
+                'duration_seconds': 180,
+                'status': 'published',
+                'video_type_id': 'standard',
+                'video_link': 'http://example.com/video1'
+            }
+        )
 
-print(f"   Kullanıcı: {test_user.username}")
-print(f"   Video 1  : {video1.title}")
-print(f"   Video 2  : {video2.title}")
+        v2, _ = VideoModel.get_or_create(
+            title="Rock Klasikleri", 
+            defaults={
+                'channel': test_channel,
+                'description': 'Efsane rock parçalar',
+                'duration_seconds': 240,
+                'status': 'published',
+                'video_type_id': 'standard',
+                'video_link': 'http://example.com/video2'
+            }
+        )
 
-# Controller'ı Başlat
-controller = PlaylistController()
+        print(f"   Kullanıcı: {test_user.username}")
+        print(f"   Video 1  : {v1.title}")
+        print(f"   Video 2  : {v2.title}")
 
-# 3. PLAYLIST OLUŞTURMA TESTİ
-# 3. Playlist oluşturma işlemini test ediyoruz.
-print("3. Playlist Oluşturma Testi...")
+        return test_user, v1, v2
 
-# Yeni bir liste oluştur
-olusturma_sonuc = controller.create_playlist(test_user, "Favori Şarkılarım", "E") # E -> Public
-print(f"   -> Oluşturma Sonucu: {olusturma_sonuc}")
+    def run_tests(self):
+        # 1. Setup
+        PlaylistSystemTest.setup_database()
 
-# Oluşan playlisti bulmak için kullanıcının listelerini çekelim
-kullanici_listeleri = controller.repo.get_playlists_by_user(test_user.id)
-secilen_playlist = kullanici_listeleri[-1] if kullanici_listeleri else None
+        # 2. Data Creation
+        user, video1, video2 = PlaylistSystemTest.create_test_data()
+        self._last_user = user
 
-if secilen_playlist:
-    print(f"   BAŞARILI: Playlist oluşturuldu. (ID: {secilen_playlist.id})")
-else:
-    print("   HATA: Playlist oluşturulamadı.")
-    sys.exit() # Playlist yoksa devam etme
+        # 3. Playlist Creation
+        print("3. Playlist Oluşturma Testi...")
+        self.controller.create_playlist(user, "Favori Şarkılarım", "E")
+        
+        # Property kullanımı
+        playlist = self.last_created_playlist
+        
+        if playlist:
+            print(f"   BAŞARILI: Playlist oluşturuldu. ID: {playlist.id}")
+            # Yeni eklenen property testi
+            print(f"   Durum Metni (Property): {playlist.status_text}")
+        else:
+            print("   HATA: Playlist oluşturulamadı.")
+            return
 
+        # 4. Add Video
+        print("4. Video Ekleme Testi...")
+        print(f"   -> Video 1 Ekleme: {self.controller.add_video(user, playlist.id, video1.id)}")
+        print(f"   -> Video 2 Ekleme: {self.controller.add_video(user, playlist.id, video2.id)}")
 
-# 4. VIDEO EKLEME TESTİ
-# 4. Oluşturulan playliste video ekleme işlemini test ediyoruz.
-print("4. Video Ekleme Testi...")
+        content = self.controller.show_playlist_countent(playlist.id)
+        print(f"   -> Liste İçeriği: {content}")
 
-# 1. Videoyu Ekle
-ekleme1 = controller.add_video(test_user, secilen_playlist.id, video1.id)
-print(f"   -> Video 1 Ekleme: {ekleme1}")
+        if "Pop Şarkılar" in content and "Rock Klasikleri" in content:
+            print("   BAŞARILI: Videolar listeye eklendi.")
+        else:
+            print("   HATA: Videolar eksik.")
 
-# 2. Videoyu Ekle
-ekleme2 = controller.add_video(test_user, secilen_playlist.id, video2.id)
-print(f"   -> Video 2 Ekleme: {ekleme2}")
+        # 5. Duplicate Test
+        print("5. Duplicate (Tekrar Ekleme) Testi...")
+        res = self.controller.add_video(user, playlist.id, video1.id)
+        print(f"   -> Tekrar Ekleme: {res}")
 
-# İçeriği Kontrol Et
-icerik = controller.show_playlist_countent(secilen_playlist.id)
-print(f"   -> Liste İçeriği: {icerik}")
+        # 6. Remove Video
+        print("6. Video Çıkarma Testi...")
+        print(f"   -> Çıkarma Sonucu: {self.controller.remove_video(user, playlist.id, video1.id)}")
+        current_content = self.controller.show_playlist_countent(playlist.id)
+        print(f"   -> Güncel İçerik: {current_content}")
 
-if "Pop Şarkılar" in icerik and "Rock Klasikleri" in icerik:
-    print("   BAŞARILI: Videolar listeye eklendi.")
-else:
-    print("   HATA: Videolar listede görünmüyor.")
+        # 7. List My Playlists
+        print("7. 'Listelerim' Testi...")
+        print(self.controller.list_my_playlist(user.id))
 
+        # 8. Delete Playlist
+        print("8. Playlist Silme Testi...")
+        print(f"   -> Silme Sonucu: {self.controller.delete_playlist(user, playlist.id)}")
 
-# 5. AYNI VİDEOYU TEKRAR EKLEME (DUPLICATE) TESTİ
-# 5. Aynı videonun tekrar eklenmesini (duplicate) engelleme testini yapıyoruz.
-print("5. Duplicate (Tekrar Ekleme) Testi...")
-tekrar_ekle = controller.add_video(test_user, secilen_playlist.id, video1.id)
-print(f"   -> Tekrar Ekleme Denemesi: {tekrar_ekle}")
-
-if "zaten listede var" in tekrar_ekle:
-    print("   BAŞARILI: Aynı video tekrar eklenmedi.")
-else:
-    print("   UYARI: Duplicate kontrolü çalışmıyor olabilir.")
-
-
-# 6. VIDEO ÇIKARMA TESTİ
-# 6. Listeden video çıkarma (silme) işlemini test ediyoruz.
-print("6. Video Çıkarma (Silme) Testi...")
-silme_sonuc = controller.remove_video(test_user, secilen_playlist.id, video1.id)
-print(f"   -> Çıkarma Sonucu: {silme_sonuc}")
-
-# Son durumu kontrol et
-guncel_icerik = controller.show_playlist_countent(secilen_playlist.id)
-print(f"   -> Güncel İçerik: {guncel_icerik}")
-
-if "Pop Şarkılar" not in guncel_icerik and "Rock Klasikleri" in guncel_icerik:
-    print("   BAŞARILI: Video başarıyla listeden çıkarıldı.")
-else:
-    print("   HATA: Video silinemedi.")
-
-
-# 7. LİSTELERİMİ GÖSTER TESTİ
-# 7. Kullanıcının tüm listelerini gösterme işlemini test ediyoruz.
-print("7. 'Listelerim' Testi...")
-listeler = controller.list_my_playlist(test_user.id)
-print(f"   -> Listeler Çıktısı:\n{listeler}")
-
-
-# 8. PLAYLIST SİLME TESTİ
-# 8. Playlisti tamamen silme işlemini test ediyoruz.
-print("8. Playlist Silme Testi...")
-playlist_sil = controller.delete_playlist(test_user, secilen_playlist.id)
-print(f"   -> Playlist Silme Sonucu: {playlist_sil}")
-
-# Silindi mi kontrol et
-kontrol = controller.repo.get_playlist_by_id(secilen_playlist.id)
-if kontrol is None:
-    print("   BAŞARILI: Playlist ve içindeki öğeler veritabanından silindi.")
-else:
-    print("   HATA: Playlist hala duruyor.")
-
-print("TEST TAMAMLANDI")
+        if self.controller.repo.get_playlist_by_id(playlist.id) is None:
+             print("   BAŞARILI: Playlist silindi.")

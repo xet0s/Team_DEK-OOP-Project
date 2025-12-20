@@ -13,4 +13,14 @@ class PlaylistModel(BaseModel):
     class Meta:
         #database e kaydedilecek tablo ismi
         table_name="playlist"
+
+    @property
+    def status_text(self):
+        """
+        Playlist'in anlık durum metnini (Public/Private) döndüren property.
+        """
+        # Circular import önlemek için burada import ediyoruz
+        from models.interaction_module.playlist_type import PlaylistLogicBase
+        logic = PlaylistLogicBase.get_playlist_logic(self)
+        return logic.get_status_text()
         

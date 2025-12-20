@@ -21,4 +21,11 @@ class PlaylistItemModel(BaseModel):
 
     class Meta:
         #Tablo ismi
-        table_name="playlist_item"
+        table_name="playlist_items"
+
+    @property
+    def formatted_added_date(self):
+        """
+        Eklenme tarihini 'DD-MM-YYYY HH:MM' formatında döndürür.
+        """
+        return self.added_at.strftime("%d-%m-%Y %H:%M")
