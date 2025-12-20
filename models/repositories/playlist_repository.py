@@ -1,5 +1,5 @@
 from models.interaction_module.playlist_base import PlaylistModel
-from models.interaction_module.playlist_type import PlaylistLogicBase#BUNA Bİ BAKK
+from models.interaction_module.playlist_item import PlaylistItemModel
 from peewee import DoesNotExist   #Böyle bir kayıt yok hatsını yakalıcaz
 
 class PlaylistRepository:
@@ -30,13 +30,13 @@ class PlaylistRepository:
 
     def add_video_to_playlist(self,playlist,video): #Listeye video ekleme 
         #PlaylistItem tablosuna kayıt atar.
-        return PlaylistLogicBase.create(playlist=playlist, video=video)
+        return PlaylistItemModel.create(playlist=playlist, video=video)
 
     def remove_video_from_playlist(self,playlist_id,video_id): #videoyu listeden çıkarma
         try:
-            query = PlaylistLogicBase.delete().where(
-                (PlaylistLogicBase.playlist == playlist_id) &
-                (PlaylistLogicBase.video == video_id)
+            query = PlaylistItemModel.delete().where(
+                (PlaylistItemModel.playlist == playlist_id) &
+                (PlaylistItemModel.video == video_id)
             )
             return query.execute() # Silinen satır sayısını döner
         except Exception as e:
@@ -45,14 +45,26 @@ class PlaylistRepository:
 
     def get_playlist_items(self, playlist_id): #Listenin içindeki videoları getirme
         # O listeye ait tüm ara tablo kayıtlarını çeker
-        return list(PlaylistLogicBase.select().where(PlaylistLogicBase.playlist == playlist_id))
+        return list(PlaylistItemModel.select().where(PlaylistItemModel.playlist == playlist_id))
 
     def check_video_in_playlist(self, playlist_id, video_id): #Video listede var mı kontrolü
         try:
-            return PlaylistLogicBase.select().where(
-                (PlaylistLogicBase.playlist == playlist_id) &
-                (PlaylistLogicBase.video == video_id)
+            return PlaylistItemModel.select().where(
+                (PlaylistItemModel.playlist == playlist_id) &
+                (PlaylistItemModel.video == video_id)
             ).get()
         except DoesNotExist:
             # Eğer yoksa hata basmaya gerek yok, sadece None dönelim
-            return None          
+            return None
+        
+    def get_video_ids_list_for_controller(self, playlist_id):
+        """
+        Video Controller'ın 'list_playlist_videos' metodu için
+        sadece ID'lerden oluşan temiz bir liste hazırlar.
+        Örn: [1, 5, 9]
+        """
+        # Mevcut metodu kullanarak satırları çekiyoruz
+        items = self.get_playlist_items(playlist_id)
+        
+        # List Comprehension ile sadece video ID'lerini alıp liste yapıyoruz
+        return [item.video.id for item in items]

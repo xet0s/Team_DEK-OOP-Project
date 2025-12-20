@@ -12,11 +12,16 @@ from models.content_module.video_base import VideoModel
 from models.interaction_module.interaction_base import InteractionModel
 from controllers.video_controller import VideoController
 from models.repositories.interaction_repository import InteractionRepository
+from models.interaction_module.playlist_base import PlaylistModel
+from models.interaction_module.playlist_type import PlaylistLogicBase
+from controllers.playlist_controller import PlaylistController
+from models.repositories.playlist_repository import PlaylistRepository
+from models.interaction_module.playlist_item import PlaylistItemModel
 
 # Veritabanını Hazırla
 db.connect()
-db.drop_tables([User, ChannelModel, VideoModel, InteractionModel])
-db.create_tables([User, ChannelModel, VideoModel, InteractionModel])
+db.drop_tables([User, ChannelModel, VideoModel, InteractionModel, PlaylistModel, PlaylistLogicBase, PlaylistItemModel])
+db.create_tables([User, ChannelModel, VideoModel, InteractionModel, PlaylistModel, PlaylistLogicBase, PlaylistItemModel])
 
 print("--- VİDEO PLAYLIST VE GÖRÜNTÜLEME TESTİ ---")
 print("-" * 50)
@@ -43,6 +48,8 @@ channel = ChannelModel.create(
 print(f"✅ Kanal Hazır: {channel.channel_name} (Limit: {channel.channel_upload_limit})")
 sleep(0.75)
 video_controller = VideoController()
+playlist_controller = PlaylistController()
+playlist_repo = PlaylistRepository()
 interaction_repo = InteractionRepository()
 
 # Video listesi Oluşturma
@@ -130,4 +137,28 @@ else:
 sleep(0.75)
 
 # Test 4: Playlist ID ile Video Getirme Testi
-#print("\n--- [TEST 4] Playlist ID ile Video Getirme ---")
+print("\n--- [TEST 4] Playlist ID ile Video Getirme ---")
+print(">> 1. Adım: 'Yol Şarkıları' adında playlist oluşturuluyor...")
+playlist_controller.create_playlist(user, "Yol Şarkıları", "E")
+created_playlist = PlaylistModel.select().order_by(PlaylistModel.id.desc()).get()
+print(f"   -> Oluşan Playlist ID: {created_playlist.id}")
+sleep(0.75)
+print(">> 2. Adım: Videolar ekleniyor (Video 1 ve Video 2)...")
+playlist_controller.add_video(user, created_playlist.id, video_1.id)
+playlist_controller.add_video(user, created_playlist.id, video_2.id)
+print("   -> Videolar eklendi.")
+sleep(0.75)
+print(">> 3. Adım: Playlist ID'sinden Video ID Listesi çekiliyor...")
+playlist_video_ids = playlist_repo.get_video_ids_list_for_controller(created_playlist.id)
+print(f"   -> Gelen ID Listesi: {playlist_video_ids}")
+sleep(0.75)
+print(">> 4. Adım: Video Controller ile ekrana basılıyor...")
+final_sonuc = video_controller.list_playlist_videos(playlist_video_ids)
+print(final_sonuc)
+sleep(0.75)
+if "Test Video 1" in str(final_sonuc) and "Test Video 2" in str(final_sonuc) and "Test Video 3" not in str(final_sonuc):
+    print(">> BAŞARILI: Playlist ID ile doğru videolar getirildi!")
+else:
+    print(">> HATA: Playlist entegrasyonunda sorun var!")
+
+print("\n--- TEST BİTTİ ---")

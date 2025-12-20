@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 from models.repositories.interaction_repository import InteractionRepository
 from models.interaction_module.interaction_type import get_interaction_logic
 from models.interaction_module.interaction_base import InteractionModel
+=======
+from models.repositories.interaction_repository import InteractionRepository     # Veritabanı işlerini yapan 'Depocu' 
+from models.interaction_module.interaction_type import get_interaction_logic     #etkileşim modulunü getirir
+from models.interaction_module.interaction_base import InteractionModel          #etkileşim türleri
+>>>>>>> c729e6ac62ced9aa25d15c5af56aaaf6004b713e
 
 class InteractionController:
     """Kullanıcı etkileşimlerini (beğeni,yorum,kaydetme,abonelik,vb) töntemlerin kontrolünü sağlar"""
@@ -9,21 +15,29 @@ class InteractionController:
         #Veritabanı için repository başlatılıyor
         self.repo=InteractionRepository()
 
+    @staticmethod
+    def validate_comment(comment_text):
+        """Yorum içeriğini kontrol eder."""
+        #eğer yorum yoksa veya sadece boşluksa False döndürür
+        if not comment_text or comment_text.strip() == "":
+            return False
+        return True
+
     #YORUM EKLEME
 
     def add_comment(self,user,video,comment_text):  #Videoya yeni yorum ekler
 
         #Yorum içeriği boş olup olmadığına bak
-        if not comment_text or comment_text.strip()=="": #yorum satırına sadece boşluk atıp bırakmış mı
-            return "Hata:Yorum içeriği boş olamaz"       #yorum boşsa hata ver
+        if not InteractionController.validate_comment(comment_text):
+            return "Hata:Yorum içeriği boş olamaz"
     
         #Veritabanına kaydedilecek yorum
         data={
-            "user":user,
-            "video":video,
-            "interaction_type":InteractionModel.TYPE_COMMENT,
-            "content": comment_text,
-            "status": "active",
+            "user":user,                                          #yorumu yapan kişi
+            "video":video,                                        #yorum yapılan video
+            "interaction_type":InteractionModel.TYPE_COMMENT,     #türü
+            "content": comment_text,                              #yorumun kendisi
+            "status": "active",                                   #durum
             }
 
         #Repositorye kaydediyor    
@@ -31,8 +45,8 @@ class InteractionController:
 
         #Kayıt başarılıysa kullanıcıya bilgi mesajı ver
         if saved_interaction:
-            logic=get_interaction_logic(saved_interaction)
-            return logic.interaction_status()
+            # Refactor: Property kullanımı
+            return saved_interaction.status_text
         else:
             return "Hata:Yorum kaydedilemedi"
 
@@ -42,7 +56,7 @@ class InteractionController:
 
         interactions = self.repo.get_comments_by_video(video_id)
         results = []     
-
+        #eğer yorum yoksa bilgi ver
         if not interactions:
             return ["Henüz yorum yapılmamış."] 
     
@@ -173,8 +187,8 @@ class InteractionController:
         #yeni kayıt oluşturcak
         saved = self.repo.add_interaction(data)
         if saved:
-                logic = get_interaction_logic(saved)
-                return logic.interaction_status() # Link kopyalandı mesajı 
+            # Refactor: Property kullanımı
+            return saved.status_text # Link kopyalandı mesajı 
         else:
                 return "Hata: Paylaşım gerçekleştirilemedi."  
 

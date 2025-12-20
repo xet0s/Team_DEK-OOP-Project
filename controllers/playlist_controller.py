@@ -1,5 +1,10 @@
+<<<<<<< HEAD:controllers/playlist_controllers.py
 from models.accounts_module.user import User                             #Yetki kontrolu
 from models.interaction_module.playlist_type import PlaylistLogicBase           #Açık/özel yapısı almak için
+=======
+from models.accounts_module.user import User
+from models.interaction_module.playlist_type import PlaylistLogicBase
+>>>>>>> c729e6ac62ced9aa25d15c5af56aaaf6004b713e:controllers/playlist_controller.py
 from models.repositories.playlist_repository import PlaylistRepository          
 from models.repositories.video_repository import VideoRepository                #Video var mı diye bakmak için
 
@@ -8,9 +13,17 @@ class PlaylistController:
         self.repo=PlaylistRepository()
         self.video_repo=VideoRepository() #Video var mı diye bakmak için
 
+
+    @staticmethod
+    def validate_playlist_title(title):
+        """Playlist başlığını kontrol eder, geçerli değilse False döner."""
+        if not title or title.strip() == "":
+            return False
+        return True
+
     #PLAYLİST OLUŞTURMA
     def create_playlist(self,current_user,title,is_public_choice):
-        if not title or title.strip()=="":
+        if not PlaylistController.validate_playlist_title(title):
             return "Lütfen geçerli bir playlist başlığı giriniz!"
         #Görünürlük ayarı (E ise True, değilse False)
         is_public_bool=True if is_public_choice.upper()=="E" else False
@@ -26,8 +39,8 @@ class PlaylistController:
         except Exception as e:
             return f"Veritabanı hatası"    
         #Playlist herkese açık/gizli 
-        playlist_logic = PlaylistLogicBase.get_playlist_logic(saved_playlist)
-        status_text = playlist_logic.get_status_text()
+        # Refactor: Property kullanarak status al
+        status_text = saved_playlist.status_text
 
         return f"""
             Playlist başarıyla oluşturuldu
@@ -99,8 +112,7 @@ class PlaylistController:
         
         output=  "/n LİSTELERİNİZ:/n " #çıktı
         for pl in playlist:
-            logic=PlaylistLogicBase.get_playlist_logic(pl)
-            status=logic.get_status_text()
+            status=pl.status_text
             #kaç video var
             count=len(self.repo.get_playlist_items(pl.id))
             output+=f"ID:{pl.id}  |{pl.title}  {status} ({count})"
@@ -131,8 +143,9 @@ class PlaylistController:
         items = self.repo.get_playlist_items(playlist_id)
         video_count = len(items)
         
-        logic = PlaylistLogicBase.get_playlist_logic(playlist)
-        status_text = logic.get_status_text()
+        video_count = len(items)
+        
+        status_text = playlist.status_text
 
         return f"""
           Playlist 
@@ -143,7 +156,3 @@ class PlaylistController:
          Durum: {status_text}
          Video sayısı: {video_count}
          """
-            
-
-
-

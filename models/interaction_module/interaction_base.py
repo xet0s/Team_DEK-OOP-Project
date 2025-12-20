@@ -23,4 +23,13 @@ class InteractionModel(BaseModel):
     class Meta:
         #Veri tabanında interactions adında tablo açacak
         table_name="interactions" 
-        
+
+    @property
+    def status_text(self):
+        """
+        Etkileşimin anlık durum mesajını döndürür.
+        """
+        from models.interaction_module.interaction_type import get_interaction_logic
+        logic = get_interaction_logic(self)
+        return logic.interaction_status() 
+    
