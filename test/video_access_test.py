@@ -46,7 +46,15 @@ sleep(0.75)
 
 # Video Oluştur (Test Edilecek Olan)
 print("\n>> Test için bir video oluşturuluyor...")
-controller.create_video(owner, channel.id, "Hasat Zamani", "Bugdaylar toplandi", 300, "Standard")
+controller.create_video(
+    current_user=owner, 
+    channel_id=channel.id, 
+    video_title="Hasat Zamani", 
+    video_description="Bugdaylar toplandi", 
+    video_duration=300, 
+    video_type_input="Standard",
+    video_category_input="Vlog"
+)
 target_video = VideoModel.select().first()
 print(f"✅ Hazırlık Tamam: Video ID {target_video.id} (Sahibi: {owner.username}) oluşturuldu.")
 sleep(0.75)
@@ -59,7 +67,8 @@ res_guest_upload = controller.create_video(
     video_title="Hacker Video",
     video_description="...",
     video_duration=10,
-    video_type_input="Short"
+    video_type_input="Short",
+    video_category_input="Education"
 )
 sleep(0.75)
 
