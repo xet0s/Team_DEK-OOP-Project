@@ -1,4 +1,4 @@
-from models.repositories import InteractionRepository
+from models.repositories.interaction_repository import InteractionRepository
 from models.interaction_module.interaction_type import get_interaction_logic
 from models.interaction_module.interaction_base import InteractionModel
 

@@ -1,4 +1,4 @@
-from models.accounts_module.user import UserBase                                #Yetki kontrolu
+from models.accounts_module.user import User                             #Yetki kontrolu
 from models.interaction_module.playlist_type import PlaylistLogicBase           #Açık/özel yapısı almak için
 from models.repositories.playlist_repository import PlaylistRepository          
 from models.repositories.video_repository import VideoRepository                #Video var mı diye bakmak için
