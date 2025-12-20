@@ -4,7 +4,6 @@ from peewee import (CharField,
                     TextField)
 from models.base_model import BaseModel
 from models.accounts_module.user import User
-from abc import ABC, abstractmethod
 
 class ChannelModel(BaseModel):
     #Foreign Key --> Bağlantı ve özel veri 
@@ -18,3 +17,25 @@ class ChannelModel(BaseModel):
     channel_info=TextField(default="Hakkımda...",null=True) #Kanal Hakkında Kısmı
     class Meta:                                             #Sql Tablosu
         table_name="channels"
+
+    @property
+    def status(self):
+        return self.channel_status
+    
+    @status.setter
+    def status(self,new_status):
+        valid_statuses=["active","suspended","pending"]
+        if new_status not in valid_statuses:
+            raise ValueError(f"Geçersiz durum! Bu liste içinde olan bir durum seçiniz :\n{valid_statuses}")
+        self.channel_status=new_status
+    
+    @classmethod
+    def get_active_channel(cls):
+        return cls.select().where(cls.channel_status=="active")
+    
+    @classmethod
+    def filter_by_category(cls,category_name):
+        return cls.select().where(cls.channel_category==category_name)
+    @classmethod
+    def check_user_has_channel(cls,user_id):
+        return cls.select().where(cls.channel_owner==user_id).exists()

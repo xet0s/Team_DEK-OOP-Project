@@ -8,6 +8,7 @@ from utils.exceptions.channel_error import (
     ChannelNotFoundError,
     ChannelAlreadyExistError,
 )
+from models.accounts_module.channel_base import ChannelModel
 class ChannelController:
     #repository bağlantısı
     def __init__(self):
@@ -15,10 +16,8 @@ class ChannelController:
     #Kanal oluşumunu sağlayan fonksiyon.
     #Kanal oluşum kurallarını,şartlarını ve hata durumlarını içinde barındırır
     def create_channel(self,channel_owner,channel_name,channel_category,channel_type,channel_info=None):
-        #Kanal var mı kontrolü
-        existing_channel= self.repo.get_channel_by_owner(channel_owner.id)
-        #Kanal varsa hata veren kısıms
-        if existing_channel != None:
+        #Kanal var mı kontrolü,
+        if ChannelModel.check_user_has_channel(channel_owner.id):
             raise ChannelLimitExceededError(channel_owner.username)
         #İsim uzunluk kontrolü
         if len(channel_name)<3:
