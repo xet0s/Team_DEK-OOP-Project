@@ -21,7 +21,7 @@ except ImportError:
     from models.interaction_module.playlist_type import PlaylistLogicBase as PlaylistLinkTable
 #Kontrol sistemini içe aktarır
 from controllers.video_controller import VideoController
-from controllers.playlist_controllers import PlaylistController
+from controllers.playlist_controller import PlaylistController
 from controllers.channel_controller import ChannelController
 from controllers.user_controller import UserControl
 from controllers.interaction_controller import InteractionController
