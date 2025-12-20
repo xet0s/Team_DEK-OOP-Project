@@ -228,3 +228,20 @@ class VideoController:
         chars = string.ascii_letters + string.digits
         random_link = ''.join(random.choice(chars) for _ in range(8)) #Uzunluk 8 karakter
         return f"https://dek.video/v/{random_link}"
+    
+    def get_channel_videos(self, channel_id):
+        """Kanalın videolarını listeler"""
+        try:
+            # Repository'deki fonksiyonu çağırıyoruz
+            videos = self.repo.get_videos_by_channel(channel_id)
+            
+            # Eğer video varsa True ve listeyi dön
+            if videos:
+                return True, videos
+            else:
+                return False, []
+        except AttributeError:
+            # Eğer repo metodu yoksa hata vermesin diye
+            return False, "Repository metodu eksik!"
+        except Exception as e:
+            return False, f"Hata: {str(e)}"

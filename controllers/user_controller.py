@@ -1,4 +1,4 @@
-import bcrypt
+import random
 from models.accounts_module.user import User
 from models.accounts_module.user_type import UserBase
 from models.repositories.user_repository import UserRepository
@@ -35,14 +35,14 @@ class UserControl:
             return False,f"Veritabanı hatası : {str(e)}"
         return (True,
 f""" 
---------------------------------
+------------------------------------------------------
     [✓]KULLANICI OLUŞTURULDU
---------------------------------
+------------------------------------------------------
     Kullanıcı Adı     : {created_user.username}
     Kullanıcı ID      : {created_user.id}
     Kullanıcı e-maili : {created_user.email}
     Kullanıcı rolü    : {created_user.role}
---------------------------------
+------------------------------------------------------
 """)
     def create_admin_user(self,username,password,email,security_code):
         #Sabit Güvenlik anahtarı
@@ -59,12 +59,6 @@ f"""
             raise WeakPasswordError()
         if '@' not in email:
             raise InvalidEmailError(email)
-        try:
-            created_user.User(username=username,email=email,role=role)
-            created_user.password=password
-            created_user.save()
-        except Exception as e:
-            return (False,f"Veritabanı hatası : {str(e)}")
         #Kaydedilecek kullanıcı verielri
         user_information={
             "username":username,
@@ -72,28 +66,29 @@ f"""
             "email":email,
             "role":role
         }
+        
         try:#Kontrol 2
             created_user=self.repo.add_user(user_information)
         except Exception as e:
             return (False,f"Veritabani Hatası : {str(e)}")
         return (True,
 f""" 
---------------------------------------
+------------------------------------------------------
     [✓]ADMİN KULLANICI OLUŞTURULDU
---------------------------------------
+------------------------------------------------------
     Kullanıcı Adı     : {created_user.username}
     Kullanıcı ID      : {created_user.id}
     Kullanıcı e-maili : {created_user.email}
     Kullanıcı rolü    : {created_user.role}
-------------------------------------
+------------------------------------------------------
 """)
     def login_user(self,username,password):
         query=self.repo.get_user_by_name(username)
-        if query==None:
-            raise UserNotFoundError(username)
-        if query.check_password:
+        if query is None:
+            return None,"HATA: kullanıcı bulunamadı"
+        if query.check_password(password):
             active_user=UserBase.get_user_policy(query.role,query)
-            return (active_user ,f""" 
+            return (active_user,f""" 
 *****************************
 ##########HOŞGELDİN##########
 *****************************
@@ -102,4 +97,25 @@ f"""
 *****************************
 """)
         else:
-            raise IncorrectPasswordError()
+            return None,"Hata! Şifre yanlış"
+        
+    def guest_login(self):
+        try:
+            temp_user=User(
+                username=f"misafir_{random.randint(1000,9999)}",
+                email="guest@dek.com",
+                role="Guest",
+            )
+            temp_user.id= -1
+
+            active_user=UserBase.get_user_policy("Guest",temp_user)
+            return active_user,f"""
+*****************************
+##########HOŞGELDİN##########
+*****************************
+    Kullanıcı  {active_user.data.username.upper()}! 
+    Yetki    : {active_user.data.role.upper()}
+*****************************
+"""
+        except Exception as e:
+            raise Exception(f"Misafir oturumu açılamadı {str(e)}")

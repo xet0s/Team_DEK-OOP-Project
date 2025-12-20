@@ -1,6 +1,12 @@
+<<<<<<< HEAD
+from models.repositories.interaction_repository import InteractionRepository
+from models.interaction_module.interaction_type import get_interaction_logic
+from models.interaction_module.interaction_base import InteractionModel
+=======
 from models.repositories.interaction_repository import InteractionRepository     # Veritabanı işlerini yapan 'Depocu' 
 from models.interaction_module.interaction_type import get_interaction_logic     #etkileşim modulunü getirir
 from models.interaction_module.interaction_base import InteractionModel          #etkileşim türleri
+>>>>>>> c729e6ac62ced9aa25d15c5af56aaaf6004b713e
 
 class InteractionController:
     """Kullanıcı etkileşimlerini (beğeni,yorum,kaydetme,abonelik,vb) töntemlerin kontrolünü sağlar"""

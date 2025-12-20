@@ -1,5 +1,10 @@
+<<<<<<< HEAD:controllers/playlist_controllers.py
+from models.accounts_module.user import User                             #Yetki kontrolu
+from models.interaction_module.playlist_type import PlaylistLogicBase           #Açık/özel yapısı almak için
+=======
 from models.accounts_module.user import User
 from models.interaction_module.playlist_type import PlaylistLogicBase
+>>>>>>> c729e6ac62ced9aa25d15c5af56aaaf6004b713e:controllers/playlist_controller.py
 from models.repositories.playlist_repository import PlaylistRepository          
 from models.repositories.video_repository import VideoRepository                #Video var mı diye bakmak için
 
