@@ -22,10 +22,13 @@ class PlaylistLogicBase(BaseModel):
             return PrivatePlaylist(playlist_model)
 
 
-class BasePlaylistStatus:
+from abc import ABC, abstractmethod
+
+class BasePlaylistStatus(ABC):
     def __init__(self, model):
         self.model = model
     
+    @abstractmethod
     def get_status_text(self):
         pass
 

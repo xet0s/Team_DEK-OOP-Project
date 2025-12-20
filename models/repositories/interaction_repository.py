@@ -10,7 +10,7 @@ class InteractionRepository:
                     video=interaction_data["video"],
                     interaction_type=interaction_data["interaction_type"],
                     content = interaction_data["content"],
-                    status = interaction_data["status"]
+                    status = interaction_data.get("status", "active")
               )
         except DoesNotExist:
               print(f"Hata !")
