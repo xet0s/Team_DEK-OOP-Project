@@ -147,7 +147,7 @@ print(f"   -> Abonelik Sonucu: {sub_sonuc}")
 
 
 # 9. GENEL RAPOR
-# 9. Test sonunda genel video etkileşim raporu.s
+# 9. Test sonunda genel video etkileşim raporunu yazdırıyoruz.
 print("FİNAL RAPORU (VİDEO İSTATİSTİKLERİ)")
 print(f"Video Başlığı : {test_video.title}")
 print(f"Like       : {controller.get_like_count(test_video.id)}")
