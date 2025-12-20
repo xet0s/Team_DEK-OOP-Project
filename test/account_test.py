@@ -1,20 +1,16 @@
 import os
 import sys
 import unittest
-
 current_dir= os.path.dirname(os.path.abspath(__file__))
 root_dir=os.path.dirname(current_dir)
 sys.path.append(root_dir)
-
 import random
 from time import sleep
 from peewee import SqliteDatabase, IntegrityError
 from models.accounts_module.user import User
 from models.accounts_module.channel_base import ChannelModel
 from controllers.channel_controller import ChannelController
-
 test_db=SqliteDatabase(":memory:")
-
 class AccountModuleMasterTest:
     """
     Hesap modulleri kapsamlı entegrasyon testi

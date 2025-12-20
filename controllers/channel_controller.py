@@ -7,7 +7,6 @@ from utils.exceptions.channel_error import (
     InvalidChannelTypeError,
     ChannelNotFoundError,
     ChannelAlreadyExistError,
-    ChannelUploadLimitError
 )
 class ChannelController:
     #repository bağlantısı
@@ -35,7 +34,8 @@ class ChannelController:
         if prepared_channel is None:
             raise InvalidChannelTypeError(channel_type)
         #Limit Belirleme
-        upload_limit=prepared_channel.get_upload_limit()
+        upload_limit=prepared_channel.upload_limit
+        visibility_score=prepared_channel.upload_limit
         #Kanal linki oluşturma
         clean_channel_name=channel_name.replace(" ","").lower()
         created_channel_link=f"https://dek.video.com/c/{clean_channel_name}/?s={random.randint(1000,9999)}"
@@ -65,6 +65,7 @@ Kanal İsmi       : {saved_channel.channel_name}
 Kanal Kategorisi : {saved_channel.channel_category}
 Kanal Türü       : {saved_channel.channel_type}
 Yükleme Limiti   : {saved_channel.channel_upload_limit}
+Görünürlük Puanı : {visibility_score}
 Kanal Linki      : {saved_channel.channel_link}
 ------------------------------------------
 """)
