@@ -16,8 +16,8 @@ from controllers.interaction_controller import InteractionController
 # Test başlangıcı
 print("INTERACTION (ETKİLEŞİM) SİSTEMİ TESTİ BAŞLIYOR")
 
-# 1. TABLOLARI OLUŞTUR (Garanti olsun)
-# 1. Veritabanı tablolarını oluşturuyoruz (yoksa).
+# 1. TABLOLARI OLUŞTUR 
+# 1. Veritabanı tablolarını oluştur(yoksa).
 print("1. Veritabanı Tabloları Kontrol Ediliyor...")
 try:
     User.create_table(safe=True)
@@ -29,7 +29,7 @@ except Exception as e:
     print(f"   Tablo uyarısı: {e}")
 
 # 2. SAHTE VERİ OLUŞTUR
-# 2. Test için gerekli sahte verileri (kullanıcı, kanal, video) oluşturuyoruz.
+# 2. Test için gerekli sahte verileri (kullanıcı, kanal, video) oluştur
 print("2. Test Verileri Oluşturuluyor...")
 
 # Kullanıcı oluştur

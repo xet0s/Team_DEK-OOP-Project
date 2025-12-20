@@ -12,13 +12,13 @@ from models.accounts_module.channel_base import ChannelModel
 from models.content_module.video_base import VideoModel
 from models.interaction_module.playlist_base import PlaylistModel
 from models.interaction_module.playlist_item import PlaylistItemModel
-from controllers.playlist_controllers import PlaylistController
+from controllers.playlist_controller import PlaylistController
 
 # Test başlangıcı
 print("PLAYLIST SİSTEMİ TESTİ BAŞLIYOR")
 
-# 1. TABLOLARI OLUŞTUR (Garanti olsun)
-# 1. Veritabanı tablolarını oluşturuyoruz. Bu işlem, tablolar yoksa hata almamamızı sağlar.
+# 1. TABLOLARI OLUŞTUR 
+# 1. Veritabanı tablolarını oluşturuyoruz.  tablolar yoksa hata almamamızı sağlar.
 print("1. Veritabanı Tabloları Kontrol Ediliyor...")
 try:
     User.create_table(safe=True)
