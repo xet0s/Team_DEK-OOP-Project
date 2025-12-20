@@ -1,5 +1,5 @@
-from models.accounts_module.user import UserBase                                #Yetki kontrolu
-from models.interaction_module.playlist_type import PlaylistLogicBase           #Açık/özel yapısı almak için
+from models.accounts_module.user import User
+from models.interaction_module.playlist_type import PlaylistLogicBase, get_playlist_logic
 from models.repositories.playlist_repository import PlaylistRepository          
 from models.repositories.video_repository import VideoRepository                #Video var mı diye bakmak için
 
@@ -26,7 +26,7 @@ class PlaylistController:
         except Exception as e:
             return f"Veritabanı hatası"    
         #Playlist herkese açık/gizli 
-        playlist_logic = PlaylistLogicBase.get_playlist_logic(saved_playlist)
+        playlist_logic = get_playlist_logic(saved_playlist)
         status_text = playlist_logic.get_status_text()
 
         return f"""
@@ -99,7 +99,7 @@ class PlaylistController:
         
         output=  "/n LİSTELERİNİZ:/n " #çıktı
         for pl in playlist:
-            logic=PlaylistLogicBase.get_playlist_logic(pl)
+            logic=get_playlist_logic(pl)
             status=logic.get_status_text()
             #kaç video var
             count=len(self.repo.get_playlist_items(pl.id))
@@ -131,7 +131,7 @@ class PlaylistController:
         items = self.repo.get_playlist_items(playlist_id)
         video_count = len(items)
         
-        logic = PlaylistLogicBase.get_playlist_logic(playlist)
+        logic = get_playlist_logic(playlist)
         status_text = logic.get_status_text()
 
         return f"""
@@ -143,7 +143,6 @@ class PlaylistController:
          Durum: {status_text}
          Video sayısı: {video_count}
          """
-            
 
 
 
