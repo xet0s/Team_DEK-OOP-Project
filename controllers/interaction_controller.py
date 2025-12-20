@@ -24,7 +24,7 @@ class InteractionController:
             "interaction_type":InteractionModel.TYPE_COMMENT,
             "content": comment_text,
             "status": "active",
-                }
+            }
 
         #Repositorye kaydediyor    
         saved_interaction = self.repo.add_interaction(data)  

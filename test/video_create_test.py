@@ -7,14 +7,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from models.database import db
 from models.accounts_module.user import User
+from models.interaction_module.interaction_base import InteractionModel
 from models.accounts_module.channel_base import ChannelModel
 from models.content_module.video_base import VideoModel
 from controllers.video_controller import VideoController
 
 # Veritabanını Hazırla
 db.connect()
-db.drop_tables([User, ChannelModel, VideoModel])
-db.create_tables([User, ChannelModel, VideoModel])
+db.drop_tables([User, ChannelModel, VideoModel, InteractionModel])
+db.create_tables([User, ChannelModel, VideoModel, InteractionModel])
 
 print("--- VİDEO OLUŞTURMA TESTİ ---")
 print("-" * 50)

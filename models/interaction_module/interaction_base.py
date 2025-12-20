@@ -6,8 +6,8 @@ from abc import ABC, abstractmethod
 
 
 class InteractionModel(BaseModel):
-    user=ForeignKeyField(User, backref='interactions', null=False)
-    video=ForeignKeyField(VideoModel, backref='interactions', null=False)
+    user=ForeignKeyField(User, backref='interactions',on_delete="CASCADE", null=False)
+    video=ForeignKeyField(VideoModel, backref='interactions',on_delete="CASCADE", null=False)
     
     TYPE_LIKE = 'like'
     TYPE_DISLIKE = 'dislike'
@@ -19,8 +19,8 @@ class InteractionModel(BaseModel):
     interaction_type = CharField(null=False)    #yorum mu beğeni mi 
     content = TextField(null=True)              #yorum metni. Like ise boş dolu
     status = CharField(default='deactive')      #duruma bakıcaz aktif ya da silindi
-    
-class Meta:
-    #Veri tabanında interactions adında tablo açacak
-    table_name="interactions" 
-    
+        
+    class Meta:
+        #Veri tabanında interactions adında tablo açacak
+        table_name="interactions" 
+        

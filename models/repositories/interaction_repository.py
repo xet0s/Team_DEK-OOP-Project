@@ -4,8 +4,18 @@ from peewee import DoesNotExist
 class InteractionRepository:
     def add_interaction(self,interaction_data):
         #Veritabanına yeni bir etkileşim satırı eklenir
-        return InteractionModel.create(**interaction_data)
-    
+        try:
+              return InteractionModel.create(
+                    user =interaction_data["user"],
+                    video=interaction_data["video"],
+                    interaction_type=interaction_data["interaction_type"],
+                    content = interaction_data["content"],
+                    status = interaction_data["status"]
+              )
+        except DoesNotExist:
+              print(f"Hata !")
+              return None
+        
     #Kontrol -> kullanıcı daha önce videoya tepki vermiş mi
     def find_interaction(self,user_id,video_id,interaction_type):
 
@@ -70,3 +80,19 @@ class InteractionRepository:
                 interaction.save()
                 return interaction
             return None
+    
+    def get_liked_videos_by_ids_by_user(self, user_id):
+          query = InteractionModel.select().where(
+                (InteractionModel.user == user_id) &
+                (InteractionModel.interaction_type == "like") &
+                (InteractionModel.status == "active")
+          )
+
+          return [i.video.id for i in query]
+    
+    def count_likes(self, video_id, type_filter="like"):
+          return InteractionModel.select().where(
+                (InteractionModel.video == video_id),
+                (InteractionModel.interaction_type == type_filter),
+                (InteractionModel.status == "active")
+          ).count()
