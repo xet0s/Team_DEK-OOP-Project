@@ -1,5 +1,5 @@
 from models.interaction_module.playlist_base import PlaylistModel
-from models.interaction_module.playlist_type import PlaylistLogicBase
+from models.interaction_module.playlist_type import PlaylistLogicBase#BUNA Bİ BAKK
 from peewee import DoesNotExist   #Böyle bir kayıt yok hatsını yakalıcaz
 
 class PlaylistRepository:

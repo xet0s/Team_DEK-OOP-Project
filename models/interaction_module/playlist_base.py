@@ -4,7 +4,7 @@ from models.accounts_module.user import User
 
 class PlaylistModel(BaseModel):
     #Playlisti oluşturan kullanıcı
-    user=ForeignKeyField(User, bacrkef='playlist') 
+    user=ForeignKeyField(User, backref='playlist') 
     #Görünürlük durumunu belirleyen Boolean tablosu
     is_public=BooleanField(default=True)
     #Playlist Bağlığı
