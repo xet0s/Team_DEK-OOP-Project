@@ -60,15 +60,13 @@ f"""
         if '@' not in email:
             raise InvalidEmailError(email)
         #Kaydedilecek kullanıcı verielri
-        user_information={
-            "username":username,
-            "password_hash":password,
-            "email":email,
-            "role":role
-        }
         
         try:#Kontrol 2
-            created_user=self.repo.add_user(user_information)
+            #Kullanıcı oluşturu
+            created_user=User(username=username,email=email,role=role)
+            #setter ile şifrelenmiş bir password getirir
+            created_user.password=password
+            created_user.save()
         except Exception as e:
             return (False,f"Veritabani Hatası : {str(e)}")
         return (True,
