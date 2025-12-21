@@ -15,7 +15,6 @@ class ChannelBase(ABC):
     @abstractmethod
     def upload_limit(self):
         pass
-    
     @staticmethod
     def get_channel_policy(channel_type_string):
         if channel_type_string=="Personal":

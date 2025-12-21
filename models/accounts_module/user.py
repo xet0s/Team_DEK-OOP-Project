@@ -28,7 +28,7 @@ class User(BaseModel):
         
         if bcrypt:
             hashed=bcrypt.hashpw(plain_password.encode("utf-8"), bcrypt.gensalt())
-            self.password_hash=hashed.decode("utf-8                                                         ")
+            self.password_hash=hashed.decode("utf-8")
         else:
             self.password_hash= f"hashed_{plain_password}"
 

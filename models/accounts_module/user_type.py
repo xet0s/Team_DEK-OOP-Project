@@ -1,7 +1,4 @@
-from .user import User
 from abc import ABC,abstractmethod
-
-
 class UserBase(ABC):
     def __init__(self,model):
         self.data=model

@@ -1,8 +1,5 @@
 from datetime import datetime
 from utils.exceptions.base_errors import DekSystemError
-"""
-Kullanıcı yazım hataları
-"""
 #Kullanıcı adı uzunluk hatası
 class UsernameLengthError(DekSystemError):
     def __init__(self, input_username,min_length):
@@ -17,9 +14,6 @@ class InvalidUsernameError(DekSystemError):
         self.timestamp = datetime.now() 
         message=f"HATA! Kullanıcı adı geçersiz karakter içeriyor!"
         super().__init__(message)
-"""
-Şifre yazım hataları
-"""
 #Zayıf şifre hatası
 class WeakPasswordError(DekSystemError):
     def __init__(self):
@@ -27,9 +21,6 @@ class WeakPasswordError(DekSystemError):
         self.timestamp = datetime.now() 
         message="HATA! Şifre güvenliği yetersiz! En az 8 karakter olmalı!"
         super().__init__(message)
-"""
-E-posta hataları
-"""
 #Geçersiz e-posta hatası
 class InvalidEmailError(DekSystemError):
     def __init__(self, input_email):
@@ -37,9 +28,6 @@ class InvalidEmailError(DekSystemError):
         self.timestamp = datetime.now() 
         message= f"HATA! {input_email} geçerli değil. Geçerli bir e-posta formatı giriniz"
         super().__init__(message)
-"""
-Veritabanı çakışma hataları
-"""
 #Varolan kullanıcı hatası
 class UserAlreadyExistError(DekSystemError):
     def __init__(self, input_username):
@@ -54,9 +42,6 @@ class EmailAlreadyExistError(DekSystemError):
         self.timestamp = datetime.now() 
         message= f"HATA! '{input_email}' halihazırda sisteme kayıtlı! Lütfen farklı bir e-posta giriniz!"
         super().__init__(message)
-"""
-Giriş ve Kimlik hatası
-"""
 #Geçersiz kullanıcı hatası
 class UserNotFoundError(DekSystemError):
     def __init__(self, input_username):
@@ -71,9 +56,6 @@ class IncorrectPasswordError(DekSystemError):
         self.timestamp = datetime.now() 
         message="HATA! Girilen şifre hatalı! Tekrar deneyin!"
         super().__init__(message)
-"""
-Yetki ve rol hatası
-"""
 #Yetkisiz giriş hatası
 class AdminPrivilegeRequiredError(DekSystemError):
     def __init__(self, username):

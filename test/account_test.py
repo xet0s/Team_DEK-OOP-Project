@@ -12,9 +12,7 @@ from models.accounts_module.channel_base import ChannelModel
 from controllers.channel_controller import ChannelController
 test_db=SqliteDatabase(":memory:")
 class AccountModuleMasterTest:
-    """
-    Hesap modulleri kapsamlı entegrasyon testi
-    """
+    """Hesap modulleri kapsamlı entegrasyon testi"""
     #Gerekli veriler
     #Başlangıç değeri olarak boş bırakıldı (None)
     def __init__(self):
@@ -25,9 +23,7 @@ class AccountModuleMasterTest:
         self.active_channel_owner = None
     #Test için ayrı bir veritabanı kurar
     def setup_database(self):
-        """
-        Geçici test veritabanı oluşumu
-        """
+        """Geçici test veritabanı oluşumu"""
         print()
         print("="*50+"\n---[KURULUM]--- \n---Veritabanı Hazırlanıyo---\n"+"="*50)
         sleep(0.5)
@@ -54,9 +50,7 @@ class AccountModuleMasterTest:
             print(f"Veritabanı kurulum hatası: {str(e)}")
     #TEST1
     def test_user_scenario(self):
-        """
-        Kullanıcı oluşumu ve benzersizlik testleri yapan kısım
-        """
+        """Kullanıcı oluşumu ve benzersizlik testleri yapan kısım"""
         print()
         print("="*50+"\n---[TEST-1] Kullanıcı Senaryoları---\n"+"="*50)
         sleep(0.5)
