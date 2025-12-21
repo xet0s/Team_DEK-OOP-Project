@@ -1,8 +1,5 @@
 from datetime import datetime
 from utils.exceptions.base_errors import DekSystemError
-"""
-Kanal oluşum hataları
-"""
 #Kullanıcı kanal limit kontrolü hatası
 class ChannelLimitExceededError(DekSystemError):
     def __init__(self,username):
@@ -24,9 +21,6 @@ class InvalidChannelTypeError(DekSystemError):
         self.timestamp = datetime.now() 
         message=f"HATA! '{channel_type}' geçersiz! Lütfen geçerli bir kanal türü giriniz!"
         super().__init__(message)
-"""
-Varlık ve arama hataları
-"""
 #Kanal bulunamadı hatası
 class ChannelNotFoundError(DekSystemError):
     def __init__(self, channel_id=None, channel_name=None):
@@ -48,17 +42,6 @@ class ChannelAlreadyExistError(DekSystemError):
         self.timestamp = datetime.now() 
         message=f"HATA! '{channel_name}' adında bir kanal zaten var!"
         super().__init__(message)
-"""
-Sahiplik ve limit hataları
-"""
-#Kanal sahibi kontrolü hatası
-# class NotChannelOwnerError(DekSystemError):
-#     def __init__(self,):
-#         self.error_code = 3001 
-#         self.timestamp = datetime.now() 
-#         message=f"HATA! Sayın '{self.username}', {self.channel_name} isimli kanala erişim hakkınız yok!"
-#         super().__init__(message)
-#Kanal yükleme limiti hatası
 class ChannelUploadLimitError(DekSystemError):
     def __init__(self,channel_name,upload_limit):
         self.error_code = 3002 

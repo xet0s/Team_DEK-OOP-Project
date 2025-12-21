@@ -1,6 +1,5 @@
 from models.accounts_module.user import User
 from peewee import DoesNotExist
-
 class UserRepository:
     #Kullanıcı Oluşturma
     def add_user(self,user_data):

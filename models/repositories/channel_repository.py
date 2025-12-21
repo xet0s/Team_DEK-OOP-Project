@@ -15,7 +15,6 @@ class ChannelRepository:
     #Kullanıcı ID si üzerinden kanal durumunu kontrol eden sistem
     def get_channel_by_owner(self,owner_id):
         return ChannelModel.get_or_none(ChannelModel.channel_owner ==owner_id)
-
     #Bütün kanalları listeleme
     def get_all_channel(self):
         return list(ChannelModel.select())
@@ -36,11 +35,9 @@ class ChannelRepository:
     #Varolan kanalı ID'si sayesinde silme
     def delete_channel(self,channel_id):
         channel=self.get_channel_by_id(channel_id)#ID'den kanalı çekme
-
         if channel:
             channel.delete_instance(recursive=True)#DB'den veri silen satır
             return True#Veri Silindi
-        
         return  False #Veri silinemedi veya bulunamadı
     #Kanalı güncelleyebilmek için veriyi çeken fonksiyon
     def update_channel(self,channel_id,updated_information):

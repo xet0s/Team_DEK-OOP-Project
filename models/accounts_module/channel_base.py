@@ -17,22 +17,18 @@ class ChannelModel(BaseModel):
     channel_info=TextField(default="Hakkımda...",null=True) #Kanal Hakkında Kısmı
     class Meta:                                             #Sql Tablosu
         table_name="channels"
-
     @property
     def status(self):
         return self.channel_status
-    
     @status.setter
     def status(self,new_status):
         valid_statuses=["active","suspended","pending"]
         if new_status not in valid_statuses:
             raise ValueError(f"Geçersiz durum! Bu liste içinde olan bir durum seçiniz :\n{valid_statuses}")
         self.channel_status=new_status
-    
     @classmethod
     def get_active_channel(cls):
         return cls.select().where(cls.channel_status=="active")
-    
     @classmethod
     def filter_by_category(cls,category_name):
         return cls.select().where(cls.channel_category==category_name)
