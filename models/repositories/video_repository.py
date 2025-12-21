@@ -35,6 +35,7 @@ class VideoRepository:
 
     #Video durumuna göre videoları listeleme
     def filter_by_status(self, status):
+        status= status.lower().strip()
         try:
             return list(VideoModel.select().where(VideoModel.status == status))
         except DoesNotExist:

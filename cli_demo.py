@@ -15,10 +15,7 @@ from models.content_module.video_base import VideoModel
 from models.interaction_module.interaction_base import InteractionModel
 from models.interaction_module.playlist_base import PlaylistModel
 #Playlist sistemini içe aktarır
-try:
-    from models.interaction_module.playlist_item import PlaylistItemModel as PlaylistLinkTable
-except ImportError:
-    from models.interaction_module.playlist_type import PlaylistLogicBase as PlaylistLinkTable
+from models.interaction_module.playlist_item import PlaylistItemModel as PlaylistLinkTable
 #Kontrol sistemini içe aktarır
 from controllers.video_controller import VideoController
 from controllers.channel_controller import ChannelController
@@ -90,16 +87,22 @@ def auth_menu():
                 print("\nÜyelik bilgileri")
                 username=get_input("Kullanıcı adı : ")
                 email=get_input("E-mail : ")
-                password=get_input("Şifre : ")
-                if r_type=="1":
-                    succes,msg= auth.create_user(username,password,email)
-                    print(msg)
-                    sleep(0.5)
-                elif r_type=="2":
-                    code=get_input("Master Key : ")
-                    succes,msg =auth.create_admin_user(username,password,email,code)
-                    print(msg)
-                    sleep(0.5)
+                while True:
+                    password=get_input("Şifre : ")
+                    if len(password)<8:
+                        print("Şifre en az 8 karakter olmalı!")
+                        continue
+                    if r_type=="1":
+                        succes,msg= auth.create_user(username,password,email)
+                        print(msg)
+                        sleep(0.5)
+                    elif r_type=="2":
+                        code=get_input("Master Key : ")
+                        succes,msg =auth.create_admin_user(username,password,email,code)
+                        print(msg)
+                        sleep(0.5)
+                    if succes:
+                        break
             else:
                 print("Hatalı seçim türü!")
                 sleep(1)
@@ -151,7 +154,7 @@ def channel_menu(current_user):
             c_name=get_input("Kanal adı (En az 3 harf) giriniz: ")
             c_cat=get_input("Kategori (Eğitim,oyun,vlog...) giriniz : ")
             print("\nKanal Türleri [Personal,Brand,Kid,Music,Education,Advertising]")
-            c_type=get_input("Kanal türü giriniz : ")
+            c_type=get_input("Kanal türü giriniz : ").capitalize()
             c_info=get_input("Kanal Hakkında (Opsiyonel) : ")
             print("İşlem Yapılıyor ...")
             sleep(0.5)
@@ -207,7 +210,7 @@ def channel_menu(current_user):
                 #Onay
                 confirm=get_input(f"'{my_channel.channel_name}' kanalını silmek istediğinize emin misiniz ?(e/h) : ")
                 if confirm.lower()=="e":
-                    success,msg=controller.delete_existing_channel(my_channel.id,current_user)
+                    success,msg=controller.delete_existing_channel(my_channel.id,user_model)
                     print(msg)
                     sleep(0.5)
                 else:
@@ -230,7 +233,10 @@ def video_menu(current_user):
     user_model=current_user.data
     user_role=user_model.role
     while True:
+        total_views = VideoModel.get_total_view_count()
         print_header(f"DEK VİDEO PLATFORMU | Kullanıcı : {user_model.username}")
+        print(f"Platform Geneli Toplam Görüntülenme Sayısı : {total_views}")
+        print("-"*40)
         sleep(0.3)
         print("1. Videoları Listele")
         print("2. Video İzle (ID ile)")
@@ -252,7 +258,7 @@ def video_menu(current_user):
             print("\n--- 📜 LİSTELEME SEÇENEKLERİ ---")
             print("1. Tüm Videoları Listele")
             print("2. Son Yüklenenler (Tarihe Göre)")
-            print("3. Duruma Göre Filtrele (Active/Deleted/Pending)")
+            print("3. Duruma Göre Filtrele (Published/Deleted)")
             print("4. Görünürlüğe Göre Filtrele (Public/Private)")
             print("0. İptal")
 
@@ -264,7 +270,7 @@ def video_menu(current_user):
             elif sub_choice=="2":
                 print("\n"+ video_controller.list_recent_videos())
             elif sub_choice=="3":
-                status_input= get_input("Aranacak Durumu giriniz (active,deleted...) : ")
+                status_input= get_input("Aranacak Durumu giriniz (published, deleted) : ")
                 print("\n"+ video_controller.list_videos_by_status(status_input))
             elif sub_choice=="4":
                 visibility_input=get_input("Görünürülük durumu giriniz (Public,Private) : ")
@@ -285,14 +291,15 @@ def video_menu(current_user):
                         print("Video Bulunamadı")
                         sleep(0.5)
                         continue
-                    msg=video_controller.watch_video(vid_id)
+                    msg=video_controller.watch_video(vid_id, user_role, user_model.id)
                     print(msg)
                     while True:
                         print("\n--- ETKİLEŞİM MENÜSÜ ---")
                         print("1. Beğen / Beğeni Geri Çek")
                         print("2. Yorum Yap")
                         print("3. Yorumları Oku")
-                        print("0. Videodan Çık")
+                        print("4. Videoyu Paylaş")
+                        print("q. Videodan Çık")
                         action=get_input("İşlem Seçiniz : ")
                         
                         if action=="1":
@@ -317,10 +324,15 @@ def video_menu(current_user):
                                     print("-" * 30)
                             else:
                                 print("Yorum bulunamadı")
-                        elif action=="0":
+                        elif action=="4":
+                            share_msg = interaction_controller.share_video(current_user.data, video_obj)
+                            print(f"\n>> {share_msg}")
+                        elif action=="q":
                             print("Videodan çıkılıyor . . . ")
                             sleep(1)
                             break
+                        else:
+                            print("Geçersiz seçim")
                     
                 except Exception as e:
                     print(f"HATA! Modül arızası : {e}")
@@ -344,8 +356,11 @@ def video_menu(current_user):
                 if not cat_input: cat_input = "General"
 
                 print("Türler: [Standard, Short, LiveStream]")
-                type_input = get_input("Video Türü: ")
+                type_input = get_input("Video Türü: ").capitalize()
                 if not type_input: type_input = "Standard"
+
+                print("Görünürlük Durumu: [Public, Private]")
+                visibility_input = get_input("Görünürlük: ").capitalize()
 
                 duration_sim = random.randint(60, 600)
 
@@ -353,41 +368,36 @@ def video_menu(current_user):
                 sleep(0.5)
                 # Rastgele içerik simülasyonu
                 content=f"vid_{random.randint(100,999)}.mp4"
-                try:
-                    msg = video_controller.create_video(
-                        current_user=user_model,
-                        channel_id=my_channel.id,
-                        video_title=title,
-                        video_description=desc,
-                        video_duration=duration_sim,
-                        video_type_input=type_input,
-                        video_category_input=cat_input
+                msg = video_controller.create_video(
+                    current_user=user_model,
+                    channel_id=my_channel.id,
+                    video_title=title,
+                    video_description=desc,
+                    video_duration=duration_sim,
+                    video_type_input=type_input,
+                    video_category_input=cat_input,
+                    video_visibility_input=visibility_input
                     )
-                    print(msg)
-                except AttributeError:
-                    print("HATA: create_video fonksiyonu controller'da bulunamadı.")
+                print(msg)
                 sleep(1)
 
         elif choice=="4":
             if not my_channel:
                 print("Yetkisiz.")
             else:
-                try:
-                    success,videos=video_controller.get_channel_videos(my_channel.id)
-                    if videos:
-                        print(f"\n{my_channel.channel_name} Videoları:")
-                        for v in videos: 
-                            # Modelindeki alan adı 'title' mı 'video_title' mı kontrol et
-                            t = getattr(v, 'title', getattr(v, 'video_title', 'Başlıksız'))
-                            print(f"ID: {v.id} | {t}")
-                        d_id = get_input("Silinecek ID (İptal: q): ")
-                        if d_id.isdigit():
-                            st, mg = video_controller.delete_existing_video(int(d_id), current_user)
-                            print(mg)
+                success,videos=video_controller.get_channel_videos(my_channel.id)
+                if videos:
+                    print(f"\n{my_channel.channel_name} Videoları:")
+                    for v in videos: 
+                        # Modelindeki alan adı 'title' mı 'video_title' mı kontrol et
+                        t = getattr(v, 'title', getattr(v, 'video_title', 'Başlıksız'))
+                        print(f"ID: {v.id} | {t}")
+                    d_id = get_input("Silinecek ID (İptal: q): ")
+                    if d_id.isdigit():
+                        st, mg = video_controller.delete_existing_video(int(d_id), user_model)
+                        print(mg)
                     else:
                         print("Videonuz yok.")
-                except AttributeError:
-                    print("HATA! get_channel_videos fonksiyonu controller'da bulunamadı.")
                 sleep(1.5)
         elif choice=="5":
             if user_role=="Guest":
@@ -406,7 +416,7 @@ def video_menu(current_user):
 
                 if playlist_c=="1":
                     p_title=get_input("Playlist ismi giriniz : ")
-                    p_public=get_input("Herkese açık olaral listelensin mi? (e/h): ")
+                    p_public=get_input("Herkese açık olarak listelensin mi? (e/h): ")
                     msg = playlist_controller.create_playlist(user_model,p_title,p_public)
                     print(msg)
                 elif playlist_c == "2":
