@@ -38,7 +38,7 @@ class ChannelRepository:
         channel=self.get_channel_by_id(channel_id)#ID'den kanalı çekme
 
         if channel:
-            channel.delete_instance()#DB'den veri silen satır
+            channel.delete_instance(recursive=True)#DB'den veri silen satır
             return True#Veri Silindi
         
         return  False #Veri silinemedi veya bulunamadı

@@ -23,12 +23,12 @@ class StandardVideo(VideoBase):
 
     def calculate_listing_score(self):
         base_score = 50
-        duration_bonus = min(self.data.duration_seconds // 60, 20)  
+        duration_bonus = min(self.data.duration // 60, 20)  
         base_score += duration_bonus            # Videonun süresine göre listeleme puanı bonusu
         return base_score   
 
     def get_processing_time_estimate(self):
-        return self.data.duration_seconds * 0.5 # İşlenme süresi tahmini (saniye cinsinden)
+        return self.data.duration * 0.5 # İşlenme süresi tahmini (saniye cinsinden)
 
 
 class ShortVideo(VideoBase):
