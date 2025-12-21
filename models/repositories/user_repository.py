@@ -27,3 +27,5 @@ class UserRepository:
         query=User.update(**updated_information).where(User.id==user_id)
         changed_row_num=query.execute() #Tetikleme
         return changed_row_num    
+    def get_all_users(self):
+        return User.select()

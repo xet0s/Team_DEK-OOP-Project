@@ -22,6 +22,7 @@ from controllers.channel_controller import ChannelController
 from controllers.user_controller import UserControl
 from controllers.interaction_controller import InteractionController
 from controllers.playlist_controller import PlaylistController
+from controllers.admin_controller import AdminController
 #Repository sistemini içe atkarır
 from models.repositories.channel_repository import ChannelRepository
 #Veritabanı bağlantısı yapar
@@ -482,17 +483,68 @@ def video_menu(current_user):
         else:
             print("Geçersiz seçim.")
 def admin_menu(current_user):
+    """Admin kullanıcılar için yönetim menüsü"""
+    admin_controller = AdminController()
+    
+    # Güvenlik Kontrolü (Çift dikiş)
+    if not admin_controller.check_admin_access(current_user):
+        print("!!! GÜVENLİK İHLALİ: BURAYA ERİŞİM YETKİNİZ YOK !!!")
+        return
+
     while True:
-        print_header(f"ADMİN PANELİ | {current_user.data.username}")
-        print("1. İstatistikleri Görüntüle (Yakında)")
-        print("q. Geri Dön")
+        print_header(f"ADMİN PANELİ | Yönetici: {current_user.data.username}")
+        print("1. 📊 Sistem İstatistikleri (Dashboard)")
+        print("2. 👥 Kullanıcı Listesi ve Yasaklama")
+        print("3. 🎬 Tüm Videoları Yönet (Zorla Silme)")
+        print("q. Ana Menüye Dön")
         
-        choice = get_input("Seçim: ")
-        if choice.lower() == "q":
+        choice = get_input("Yönetim İşlemi: ")
+        
+        # --- [1] DASHBOARD ---
+        if choice == "1":
+            stats = admin_controller.get_system_stats()
+            print("\n--- SİSTEM RAPORU ---")
+            if "error" in stats:
+                print(f"Veri alınamadı: {stats['error']}")
+            else:
+                print(f"👤 Toplam Üye   : {stats.get('users', 0)}")
+                print(f"📹 Toplam Video : {stats.get('videos', 0)}")
+                print(f"✅ Sistem Durumu: {stats.get('status', 'OK')}")
+            input("\nDevam etmek için Enter...")
+
+        elif choice == "2":
+            print("\n--- KAYITLI KULLANICILAR ---")
+            users = admin_controller.list_all_users()
+            for u in users:
+                print(f"ID: {u.id} | {u.username} | Rol: {u.role} | Email: {u.email}")
+            
+            act = get_input("Yasaklamak (Silmek) istediğiniz ID (İptal: Enter): ")
+            if act.isdigit():
+                if int(act) == current_user.data.id:
+                    print("❌ Kendinizi silemezsiniz!")
+                else:
+                    confirm = get_input(f"{act} ID'li kullanıcı silinecek. Emin misin? (evet/hayır): ")
+                    if confirm.lower() == "evet":
+                        success, msg = admin_controller.ban_user(int(act))
+                        print(f">> {msg}")
+            sleep(1)
+        elif choice == "3":
+            vc = VideoController()
+            
+            print("\n--- PLATFORMDAKİ TÜM VİDEOLAR ---")
+            print(vc.list_all_videos())
+            
+            v_id = get_input("Kaldırılacak (Sansürlenecek) Video ID (İptal: Enter): ")
+            if v_id.isdigit():
+                reason = get_input("Silme Sebebi (Log için): ")
+                success, msg = admin_controller.delete_harmful_video(int(v_id))
+                print(f">> {msg} (Sebep: {reason})")
+            sleep(1.5)
+
+        elif choice.lower() == "q":
             break
         else:
-            print("Bu özellik yapım aşamasında.")
-            sleep(1)
+            print("Geçersiz işlem.")
 def main_menu(active_user):
     """Kullanıcı rolüne göre menüleri yönlendiren ana fonksiyon"""
     user_role = active_user.data.role
