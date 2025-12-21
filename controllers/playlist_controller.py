@@ -1,10 +1,10 @@
-<<<<<<< HEAD:controllers/playlist_controllers.py
+
 from models.accounts_module.user import User                             #Yetki kontrolu
 from models.interaction_module.playlist_type import PlaylistLogicBase           #Açık/özel yapısı almak için
-=======
+
 from models.accounts_module.user import User
 from models.interaction_module.playlist_type import PlaylistLogicBase
->>>>>>> c729e6ac62ced9aa25d15c5af56aaaf6004b713e:controllers/playlist_controller.py
+
 from models.repositories.playlist_repository import PlaylistRepository          
 from models.repositories.video_repository import VideoRepository                #Video var mı diye bakmak için
 
@@ -110,7 +110,7 @@ class PlaylistController:
         if not playlist:
             return "Henüz bir listeniz yok."
         
-        output=  "/n LİSTELERİNİZ:/n " #çıktı
+        output=  "\nLİSTELERİNİZ:\n " #çıktı
         for pl in playlist:
             status=pl.status_text
             #kaç video var
@@ -119,7 +119,7 @@ class PlaylistController:
         return output      
     
     #Liste içeriğini göster
-    def show_playlist_countent(self,playlist_id):
+    def show_playlist_content(self,playlist_id):
         playlist=self.repo.get_playlist_by_id(playlist_id)
         if not playlist:
             return "Playlist bulunamadı"
@@ -128,7 +128,7 @@ class PlaylistController:
         if not items:
             return f"{playlist.title} listesi boş"
         
-        output= f"{playlist.title} içeriği:"
+        output= f"{playlist.title} içeriği:\n"
         for item in items:
             #asıl videoya gidicek
             output += f"{item.video.title}"
@@ -143,13 +143,12 @@ class PlaylistController:
         items = self.repo.get_playlist_items(playlist_id)
         video_count = len(items)
         
-        video_count = len(items)
-        
         status_text = playlist.status_text
 
         return f"""
-          Playlist 
-         -------------
+        --------------
+            Playlist 
+        --------------
          ID: {playlist.id}
          Playlist adı: {playlist.title}
          Playlist sahibi:{playlist.user.username}

@@ -1,12 +1,12 @@
-<<<<<<< HEAD
+
 from models.repositories.interaction_repository import InteractionRepository
 from models.interaction_module.interaction_type import get_interaction_logic
 from models.interaction_module.interaction_base import InteractionModel
-=======
+
 from models.repositories.interaction_repository import InteractionRepository     # Veritabanı işlerini yapan 'Depocu' 
 from models.interaction_module.interaction_type import get_interaction_logic     #etkileşim modulunü getirir
 from models.interaction_module.interaction_base import InteractionModel          #etkileşim türleri
->>>>>>> c729e6ac62ced9aa25d15c5af56aaaf6004b713e
+
 
 class InteractionController:
     """Kullanıcı etkileşimlerini (beğeni,yorum,kaydetme,abonelik,vb) töntemlerin kontrolünü sağlar"""
@@ -61,11 +61,17 @@ class InteractionController:
             return ["Henüz yorum yapılmamış."] 
     
         for interaction in interactions:
-                logic = get_interaction_logic(interaction) 
-                # Kullanıcı adı ve yorum içeriğini birleştir
-                formatted_comment = f" {interaction.user.username}: {interaction.content}"
-                results.append(formatted_comment)
-            
+                try:
+                    
+                    username=interaction.user.username
+                    
+                    content=interaction.content
+                    formatted_comment = f"👤 {username}: {content}"
+                    results.append(formatted_comment)
+                except AttributeError:
+                # Eğer bir veri eksikse programı durdurma, atla
+                    results.append("⚠️ (Hatalı yorum verisi)")
+                    continue
         return results
 
     #Beğenme 
