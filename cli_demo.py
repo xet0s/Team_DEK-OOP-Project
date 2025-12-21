@@ -21,10 +21,10 @@ except ImportError:
     from models.interaction_module.playlist_type import PlaylistLogicBase as PlaylistLinkTable
 #Kontrol sistemini içe aktarır
 from controllers.video_controller import VideoController
-from controllers.playlist_controller import PlaylistController
 from controllers.channel_controller import ChannelController
 from controllers.user_controller import UserControl
 from controllers.interaction_controller import InteractionController
+from controllers.playlist_controller import PlaylistController
 #Repository sistemini içe atkarır
 from models.repositories.channel_repository import ChannelRepository
 #Veritabanı bağlantısı yapar
@@ -226,9 +226,9 @@ def video_menu(current_user):
     video_controller=VideoController()
     interaction_controller=InteractionController()
     channel_repo=ChannelRepository()
+    playlist_controller=PlaylistController()
     user_model=current_user.data
     user_role=user_model.role
-
     while True:
         print_header(f"DEK VİDEO PLATFORMU | Kullanıcı : {user_model.username}")
         sleep(0.3)
@@ -240,6 +240,7 @@ def video_menu(current_user):
             if my_channel:
                 print("3. Video Yükle")
                 print("4. Videoları Yönet")
+                print("5. Playlist İşlemleri")
             else:
                 print("Vide yükleme ve yönetme işlemleri için kanal açmalısınız . ")
                 sleep(0.5)
@@ -284,7 +285,7 @@ def video_menu(current_user):
                         print("Video Bulunamadı")
                         sleep(0.5)
                         continue
-                    stats,msg=video_controller.watch_video(vid_id,current_user)
+                    msg=video_controller.watch_video(vid_id)
                     print(msg)
                     while True:
                         print("\n--- ETKİLEŞİM MENÜSÜ ---")
@@ -298,22 +299,21 @@ def video_menu(current_user):
                             if user_role=="Guest":
                                 print("Misafir girişteyken etkileşimde bulunamazsınız.")
                             else:
-                                success,l_msg=interaction_controller.toggle_like(current_user.data,vid_id)
+                                l_msg=interaction_controller.toggle_like(current_user.data,video_obj)
                                 print(f"\n>> {l_msg}")
                         elif action=="2":
                             if user_role=="Guest":
                                 print("Misafir girişteyken etkileşimde bulunamazsınız.")
                             else:
                                 comment_text=get_input("Yorumunuzu yazınız : ")
-                                success,c_msg=interaction_controller.add_comment(current_user.data,vid_id,comment_text)
+                                c_msg=interaction_controller.add_comment(current_user.data,video_obj,comment_text)
                                 print(f"\n>> {c_msg}")
                         elif action=="3":
-                            success,comments=interaction_controller.get_video_comment(vid_id)
-                            if success and comments:
+                            comments=interaction_controller.get_video_comment(vid_id)
+                            if comments:
                                 print("--- Video Yorumları ---")
                                 for c in comments:
-                                    print(f"{c.user.username}: {c.content}")
-                                    print(f" {c.created_at.strftime('%Y-%m-%d %H:%M')}")
+                                    print(c)
                                     print("-" * 30)
                             else:
                                 print("Yorum bulunamadı")
@@ -322,8 +322,8 @@ def video_menu(current_user):
                             sleep(1)
                             break
                     
-                except AttributeError:
-                    print("HATA! Modül arızası : 'watch_video' modulü bulunamadı")
+                except Exception as e:
+                    print(f"HATA! Modül arızası : {e}")
                 sleep(1)
                 input("Devam . . .")
             else:
@@ -389,6 +389,82 @@ def video_menu(current_user):
                 except AttributeError:
                     print("HATA! get_channel_videos fonksiyonu controller'da bulunamadı.")
                 sleep(1.5)
+        elif choice=="5":
+            if user_role=="Guest":
+                print("Misafir kullanıcı erişimine kapalı")
+                sleep(1)
+                continue
+            while True:
+                print("\n--- PLAYLIST MENÜSÜ ---")
+                print("1. Yeni Playlist Oluştur")
+                print("2. Playlistlerimi Listele")
+                print("3. Playlist İçeriğini Gör (Detay)")
+                print("4. Playlist Sil")
+                print("5. Videolarımı Playliste Ekle")
+                print("0. Video Menüsüne Dön")
+                playlist_c=get_input("İşlem seçiniz : ")
+
+                if playlist_c=="1":
+                    p_title=get_input("Playlist ismi giriniz : ")
+                    p_public=get_input("Herkese açık olaral listelensin mi? (e/h): ")
+                    msg = playlist_controller.create_playlist(user_model,p_title,p_public)
+                    print(msg)
+                elif playlist_c == "2":
+                    print(playlist_controller.list_my_playlist(user_model.id))
+                elif playlist_c=="3":
+                    pid=get_input("Liste ID'si giriniz : ")
+                    if pid.isdigit():
+                        print(playlist_controller.get_playlist_details(int(pid)))
+                        print("-"*30)
+                        print(playlist_controller.show_playlist_content(int(pid)))
+                        sub_act = get_input("Video silmek ister misiniz? (ID girin veya Enter basıp geçin): ")
+                        if sub_act.isdigit():
+                            res = playlist_controller.remove_video(user_model, int(pid), int(sub_act))
+                            print(res)
+                    else:
+                        print("Geçersiz ID.")
+                elif playlist_c=="4":
+                    pid = get_input("Silinecek Playlist ID: ")
+                    if pid.isdigit():
+                        res = playlist_controller.delete_playlist(user_model, int(pid))
+                        print(res)
+                    else:
+                        print("Geçersiz ID.")
+                elif playlist_c=="5":
+                    if not my_channel:
+                        print("Kanalınız olmadığı için liste oluşturamazsınız!")
+                    else:
+                        print("\n---1. Adım---\n---Playlist Seçme---")
+                        print(playlist_controller.list_my_playlist(user_model.id))
+                        target_pid= get_input("Video ekleyeceğiniz playlisti seçiniz : ")
+
+                        if not target_pid.isdigit():
+                            print("Geçersiz ID!")
+                            continue
+
+                        print("\n---2. Adım---\n---Video Seçme---")
+                        s, my_videos = video_controller.get_channel_videos(my_channel.id)
+                        if not s or not my_videos:
+                            print("Kanalınızda video yok!")
+                        else:
+                            for v in my_videos:
+                                t=getattr(v,"title",getattr(v,"video_title","Başlıksız"))
+                                print(f"ID: {v.id} | {t}")
+                            target_vid = get_input("Hangi Video ID?: ")
+                            if target_vid.isdigit():
+                                print("Ekleniyor . . .")
+                                sleep(0.3)
+                                result = playlist_controller.add_video(user_model, int(target_pid), int(target_vid))
+                                print(f"\n>> {result}")
+                            else:
+                                print("Geçersiz ID")
+
+
+                
+                elif playlist_c=="0":
+                    break
+                else:
+                    print("Geçersiz seçim")
         elif choice.lower() == "q":
             print("Sistem kapatılıyor . . .")
             sleep(1)

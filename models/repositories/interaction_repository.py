@@ -1,20 +1,20 @@
 from models.interaction_module.interaction_base import InteractionModel
 from peewee import DoesNotExist
-
+from models.accounts_module.user import User
 class InteractionRepository:
     def add_interaction(self,interaction_data):
         #Veritabanına yeni bir etkileşim satırı eklenir
         try:
-              return InteractionModel.create(
+            return InteractionModel.create(
                     user =interaction_data["user"],
                     video=interaction_data["video"],
                     interaction_type=interaction_data["interaction_type"],
                     content = interaction_data["content"],
                     status = interaction_data.get("status", "active")
-              )
+            )
         except DoesNotExist:
-              print(f"Hata !")
-              return None
+            print(f"Hata !")
+            return None
         
     #Kontrol -> kullanıcı daha önce videoya tepki vermiş mi
     def find_interaction(self,user_id,video_id,interaction_type):
@@ -37,7 +37,8 @@ class InteractionRepository:
             """
             try:
                 return (InteractionModel
-                        .select()
+                        .select(InteractionModel, User)
+                        .join(User)
                         .where(
                             (InteractionModel.video == video_id) &
                             (InteractionModel.interaction_type == InteractionModel.TYPE_COMMENT) &
