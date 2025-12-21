@@ -3,7 +3,7 @@ from models.base_model import BaseModel
 from models.accounts_module.channel_base import ChannelModel
 
 class VideoModel(BaseModel):
-    channel = ForeignKeyField(ChannelModel, backref='videos', null=False)       # Video'nun ait olduğu kanal
+    channel = ForeignKeyField(ChannelModel,on_delete="CASCADE", backref='videos', null=False)       # Video'nun ait olduğu kanal
     title = CharField(max_length=150, null=False)                               # Video başlığı
     description = TextField(null=True)                                          # Video açıklaması
     __duration_seconds = IntegerField(column_name="duration_seconds",default=0) # Video süresi (saniye cinsinden)(private)

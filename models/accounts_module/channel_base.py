@@ -7,7 +7,7 @@ from models.accounts_module.user import User
 
 class ChannelModel(BaseModel):
     #Foreign Key --> Bağlantı ve özel veri 
-    channel_owner=ForeignKeyField(User,backref="channel")   #Kanal sahibi (kullanıcı tablosuna bağlantı)
+    channel_owner=ForeignKeyField(User,on_delete="CASCADE",backref="channel")   #Kanal sahibi (kullanıcı tablosuna bağlantı)
     channel_name=CharField(unique=True,null=False)          #Kanal ismi
     channel_category=CharField(null=False)                  #Kanal kategorisi
     channel_status=CharField(default="pending_verification")#Kanal durumu

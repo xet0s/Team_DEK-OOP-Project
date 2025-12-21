@@ -469,9 +469,6 @@ def video_menu(current_user):
                                 print(f"\n>> {result}")
                             else:
                                 print("Geçersiz ID")
-
-
-                
                 elif playlist_c=="0":
                     break
                 else:
@@ -493,9 +490,9 @@ def admin_menu(current_user):
 
     while True:
         print_header(f"ADMİN PANELİ | Yönetici: {current_user.data.username}")
-        print("1. 📊 Sistem İstatistikleri (Dashboard)")
-        print("2. 👥 Kullanıcı Listesi ve Yasaklama")
-        print("3. 🎬 Tüm Videoları Yönet (Zorla Silme)")
+        print("1. Sistem İstatistikleri (Dashboard)")
+        print("2. Kullanıcı Listesi ve Yasaklama")
+        print("3. Tüm Videoları Yönet (Zorla Silme)")
         print("q. Ana Menüye Dön")
         
         choice = get_input("Yönetim İşlemi: ")
@@ -507,9 +504,9 @@ def admin_menu(current_user):
             if "error" in stats:
                 print(f"Veri alınamadı: {stats['error']}")
             else:
-                print(f"👤 Toplam Üye   : {stats.get('users', 0)}")
-                print(f"📹 Toplam Video : {stats.get('videos', 0)}")
-                print(f"✅ Sistem Durumu: {stats.get('status', 'OK')}")
+                print(f"Toplam Üye   : {stats.get('users', 0)}")
+                print(f"Toplam Video : {stats.get('videos', 0)}")
+                print(f"Sistem Durumu: {stats.get('status', 'OK')}")
             input("\nDevam etmek için Enter...")
 
         elif choice == "2":
@@ -521,7 +518,7 @@ def admin_menu(current_user):
             act = get_input("Yasaklamak (Silmek) istediğiniz ID (İptal: Enter): ")
             if act.isdigit():
                 if int(act) == current_user.data.id:
-                    print("❌ Kendinizi silemezsiniz!")
+                    print("Kendinizi silemezsiniz!")
                 else:
                     confirm = get_input(f"{act} ID'li kullanıcı silinecek. Emin misin? (evet/hayır): ")
                     if confirm.lower() == "evet":
