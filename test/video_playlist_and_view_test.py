@@ -20,8 +20,13 @@ from models.interaction_module.playlist_item import PlaylistItemModel
 
 # Veritabanını Hazırla
 db.connect()
-db.drop_tables([User, ChannelModel, VideoModel, InteractionModel, PlaylistModel, PlaylistLogicBase, PlaylistItemModel])
-db.create_tables([User, ChannelModel, VideoModel, InteractionModel, PlaylistModel, PlaylistLogicBase, PlaylistItemModel])
+try:
+    from models.interaction_module.playlist_item import PlaylistItemModel
+    from models.interaction_module.playlist_base import PlaylistModel
+    db.drop_tables([PlaylistItemModel, PlaylistModel, InteractionModel, VideoModel, ChannelModel, User], safe=True)
+except Exception:
+    pass
+db.create_tables([User, ChannelModel, VideoModel, InteractionModel, PlaylistModel, PlaylistItemModel])
 
 print("--- VİDEO PLAYLIST VE GÖRÜNTÜLEME TESTİ ---")
 print("-" * 50)
@@ -61,7 +66,8 @@ video_controller.create_video(
     video_description="Açıklama 1",
     video_duration=100,
     video_type_input="Standard",
-    video_category_input="General"
+    video_category_input="General",
+    video_visibility_input="public"
     )
 video_controller.create_video(
     current_user=user,
@@ -70,7 +76,8 @@ video_controller.create_video(
     video_description="Açıklama 2",
     video_duration=200,
     video_type_input="Standard",
-    video_category_input="General"
+    video_category_input="General",
+    video_visibility_input="public"
     )
 video_controller.create_video(
     current_user=user,
@@ -79,7 +86,8 @@ video_controller.create_video(
     video_description="Açıklama 3",
     video_duration=300,
     video_type_input="Standard",
-    video_category_input="General"
+    video_category_input="General",
+    video_visibility_input="public"
     )
 video_1 = VideoModel.get(VideoModel.title == "Test Video 1")
 video_2 = VideoModel.get(VideoModel.title == "Test Video 2")
@@ -89,9 +97,9 @@ print(">> Videolar oluşturuldu ve kanala eklendi.")
 
 # Test 1: İzlenme Sayısı Testi
 print("\n--- [TEST 1] Video İzlenme Sayısı ---")
-video_controller.watch_video(video_1.id)
-video_controller.watch_video(video_1.id)
-video_controller.watch_video(video_1.id)
+video_controller.watch_video(video_1.id, user.role, user.id)
+video_controller.watch_video(video_1.id, user.role, user.id)
+video_controller.watch_video(video_1.id, user.role, user.id)
 video_1_guncel = VideoModel.get_by_id(video_1.id)
 if video_1_guncel.view_count == 3:
     print(">> BAŞARILI: İzlenme sayısı doğru!")

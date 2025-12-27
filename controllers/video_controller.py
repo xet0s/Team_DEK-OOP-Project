@@ -1,6 +1,7 @@
 from email import policy
 import string
 import random
+import textwrap
 from models.accounts_module.user_type import UserBase
 from models.content_module.category_type import CategoryBase
 from models.accounts_module.channel_base import ChannelModel
@@ -137,12 +138,12 @@ class VideoController:
 
         if is_updated:
             updated_video = self.repo.get_video_by_id(video_id)
-            return True, f"""
-                    Video başarıyla güncellendi!
-                    Video ID: {updated_video.id}
-                    Yeni Başlık: {updated_video.title}
-                    Yeni Açıklama: {updated_video.description}
-                    """
+            return (True, textwrap.dedent(f"""
+Video başarıyla güncellendi!
+Video ID: {updated_video.id}
+Yeni Başlık: {updated_video.title}
+Yeni Açıklama: {updated_video.description}
+"""))
         else:
             return "Video güncellenemedi"
 

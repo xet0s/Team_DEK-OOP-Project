@@ -35,9 +35,9 @@ class PlaylistSystemTest:
         if not self._last_playlist:
             # Eğer henüz atanmadıysa, kullanıcının son playlistini bulmaya çalış
             if self._last_user:
-                 playlists = self.controller.repo.get_playlists_by_user(self._last_user.id)
-                 if playlists:
-                     self._last_playlist = playlists[-1]
+                playlists = self.controller.repo.get_playlists_by_user(self._last_user.id)
+                if playlists:
+                    self._last_playlist = playlists[-1]
         return self._last_playlist
 
     @staticmethod
@@ -146,7 +146,7 @@ class PlaylistSystemTest:
         print(f"   -> Video 1 Ekleme: {self.controller.add_video(user, playlist.id, video1.id)}")
         print(f"   -> Video 2 Ekleme: {self.controller.add_video(user, playlist.id, video2.id)}")
 
-        content = self.controller.show_playlist_countent(playlist.id)
+        content = self.controller.show_playlist_content(playlist.id)
         print(f"   -> Liste İçeriği: {content}")
 
         if "Pop Şarkılar" in content and "Rock Klasikleri" in content:
@@ -162,7 +162,7 @@ class PlaylistSystemTest:
         # 6. Remove Video
         print("6. Video Çıkarma Testi...")
         print(f"   -> Çıkarma Sonucu: {self.controller.remove_video(user, playlist.id, video1.id)}")
-        current_content = self.controller.show_playlist_countent(playlist.id)
+        current_content = self.controller.show_playlist_content(playlist.id)
         print(f"   -> Güncel İçerik: {current_content}")
 
         # 7. List My Playlists
@@ -174,4 +174,8 @@ class PlaylistSystemTest:
         print(f"   -> Silme Sonucu: {self.controller.delete_playlist(user, playlist.id)}")
 
         if self.controller.repo.get_playlist_by_id(playlist.id) is None:
-             print("   BAŞARILI: Playlist silindi.")
+            print("   BAŞARILI: Playlist silindi.")
+    
+if __name__ == "__main__":
+    test_suite = PlaylistSystemTest()
+    test_suite.run_tests()

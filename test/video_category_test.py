@@ -14,7 +14,12 @@ from controllers.video_controller import VideoController
 
 # Veritabanını Hazırla
 db.connect()
-db.drop_tables([User, ChannelModel, VideoModel, InteractionModel])
+try:
+    from models.interaction_module.playlist_item import PlaylistItemModel
+    from models.interaction_module.playlist_base import PlaylistModel
+    db.drop_tables([PlaylistItemModel, PlaylistModel, InteractionModel, VideoModel, ChannelModel, User], safe=True)
+except Exception:
+    pass
 db.create_tables([User, ChannelModel, VideoModel, InteractionModel])
 
 print("--- KATEGORİ, ETİKET VE AÇIKLAMA TESTİ ---")
@@ -45,7 +50,8 @@ video1 = controller.create_video(
         video_description="Bu bir oyun incelemesi videosudur.",
         video_duration=600,
         video_type_input="Standard",
-        video_category_input="Gaming"
+        video_category_input="Gaming",
+        video_visibility_input="Public"
         )
 print(video1)
 sleep(0.75)
@@ -70,7 +76,8 @@ video2 = controller.create_video(
         video_description="Bu bir eğitim videosudur.",
         video_duration=800,
         video_type_input="Standard",
-        video_category_input="Education"
+        video_category_input="Education",
+        video_visibility_input="Public"
         )
 print(video2)
 sleep(0.75)

@@ -58,3 +58,9 @@ class VideoModel(BaseModel):
         videos = cls.select()
         total_views = sum(video.view_count for video in videos)
         return total_views
+    
+    # Kapsüllenmiş status field'ına sınıf içerisinden erişen metod
+    @classmethod
+    def filter_videos_by_status(cls, status_input):
+        status_input = status_input.lower().strip()
+        return list(cls.select().where(cls.__status == status_input))

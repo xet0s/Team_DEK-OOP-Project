@@ -14,7 +14,12 @@ from controllers.video_controller import VideoController
 
 # Veritabanını Hazırla
 db.connect()
-db.drop_tables([User, ChannelModel, VideoModel, InteractionModel])
+try:
+    from models.interaction_module.playlist_item import PlaylistItemModel
+    from models.interaction_module.playlist_base import PlaylistModel
+    db.drop_tables([PlaylistItemModel, PlaylistModel, InteractionModel, VideoModel, ChannelModel, User], safe=True)
+except Exception:
+    pass
 db.create_tables([User, ChannelModel, VideoModel, InteractionModel])
 
 print("--- VİDEO MODÜLÜ GÜVENLİK VE ROL TESTİ ---")
@@ -53,7 +58,8 @@ controller.create_video(
     video_description="Bugdaylar toplandi", 
     video_duration=300, 
     video_type_input="Standard",
-    video_category_input="Vlog"
+    video_category_input="Vlog",
+    video_visibility_input="Public"
 )
 target_video = VideoModel.select().first()
 print(f"✅ Hazırlık Tamam: Video ID {target_video.id} (Sahibi: {owner.username}) oluşturuldu.")
@@ -68,7 +74,8 @@ res_guest_upload = controller.create_video(
     video_description="...",
     video_duration=10,
     video_type_input="Short",
-    video_category_input="Education"
+    video_category_input="Education",
+    video_visibility_input="Private"
 )
 sleep(0.75)
 

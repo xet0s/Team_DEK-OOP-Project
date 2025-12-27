@@ -14,7 +14,12 @@ from controllers.video_controller import VideoController
 
 # Veritabanını Hazırla
 db.connect()
-db.drop_tables([User, ChannelModel, VideoModel, InteractionModel])
+try:
+    from models.interaction_module.playlist_item import PlaylistItemModel
+    from models.interaction_module.playlist_base import PlaylistModel
+    db.drop_tables([PlaylistItemModel, PlaylistModel, InteractionModel, VideoModel, ChannelModel, User], safe=True)
+except Exception:
+    pass
 db.create_tables([User, ChannelModel, VideoModel, InteractionModel])
 
 print("--- VİDEO OLUŞTURMA TESTİ ---")
@@ -56,7 +61,8 @@ sonuc1 = video_controller.create_video(
     video_description="Giriş",
     video_duration=120,
     video_type_input="Standard",
-    video_category_input="Education"
+    video_category_input="Education",
+    video_visibility_input="public"
 )
 print(sonuc1)
 sleep(0.75)
@@ -81,7 +87,8 @@ sonuc2 = video_controller.create_video(
     video_description="Test Yayını",
     video_duration=3600,
     video_type_input="LiveStream",
-    video_category_input="General"
+    video_category_input="General",
+    video_visibility_input="public"
 )
 print(sonuc2)
 sleep(0.75)
@@ -101,7 +108,8 @@ sonuc3 = video_controller.create_video(
     video_description="Bu yüklenmemeli",
     video_duration=50,
     video_type_input="Short",
-    video_category_input="Gaming"
+    video_category_input="Gaming",
+    video_visibility_input="private"
 )
 print(sonuc3)
 sleep(0.75)
