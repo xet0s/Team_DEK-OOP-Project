@@ -14,7 +14,12 @@ from controllers.video_controller import VideoController
 
 # Veritabanını Hazırla
 db.connect()
-db.drop_tables([User, ChannelModel, VideoModel, InteractionModel])
+try:
+    from models.interaction_module.playlist_item import PlaylistItemModel
+    from models.interaction_module.playlist_base import PlaylistModel
+    db.drop_tables([PlaylistItemModel, PlaylistModel, InteractionModel, VideoModel, ChannelModel, User], safe=True)
+except Exception:
+    pass
 db.create_tables([User, ChannelModel, VideoModel, InteractionModel])
 
 print("--- VİDEO SİLME VE GÜVENLİK TESTİ ---")
@@ -50,7 +55,8 @@ controller.create_video(
     video_description="Elveda dünya",
     video_duration=300,
     video_type_input="Standard",
-    video_category_input="General"
+    video_category_input="General",
+    video_visibility_input="public"
 )
 sleep(0.75)
 

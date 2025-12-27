@@ -14,7 +14,12 @@ from controllers.video_controller import VideoController
 
 # Veritabanını Hazırla
 db.connect()
-db.drop_tables([User, ChannelModel, VideoModel, InteractionModel])
+try:
+    from models.interaction_module.playlist_item import PlaylistItemModel
+    from models.interaction_module.playlist_base import PlaylistModel
+    db.drop_tables([PlaylistItemModel, PlaylistModel, InteractionModel, VideoModel, ChannelModel, User], safe=True)
+except Exception:
+    pass
 db.create_tables([User, ChannelModel, VideoModel, InteractionModel])
 
 print("--- VİDEO GÜNCELLEME VE YETKİ TESTİ ---")
@@ -51,7 +56,8 @@ res = controller.create_video(
     video_description="Eski Açıklama",
     video_duration=100,
     video_type_input="Standard",
-    video_category_input="General"
+    video_category_input="General",
+    video_visibility_input="public"
 )
 sleep(0.75)
 
@@ -87,7 +93,7 @@ sonuc2 = controller.update_existing_video(
     new_title="Yeni Süper Başlık",
     new_description="Güncel Açıklama"
 )
-print(sonuc2)
+print("SONUÇ:",sonuc2)
 sleep(0.75)
 
 guncel_video = VideoModel.get_by_id(video_id)
@@ -106,7 +112,7 @@ sonuc3 = controller.update_existing_video(
     new_description="Sadece burası değişti v2"
     # new_title = None
 )
-print(sonuc3)
+print("SONUÇ:",sonuc3)
 sleep(0.75)
 
 final_video = VideoModel.get_by_id(video_id)

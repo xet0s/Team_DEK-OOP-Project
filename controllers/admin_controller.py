@@ -1,5 +1,3 @@
-# controllers/admin_controller.py
-
 from models.repositories.user_repository import UserRepository
 from models.repositories.video_repository import VideoRepository
 from models.repositories.channel_repository import ChannelRepository
@@ -11,7 +9,6 @@ from models.accounts_module.channel_base import ChannelModel
 
 class AdminController:
     def __init__(self):
-        # Admin her yere erişebilir, o yüzden tüm repoları başlatıyoruz
         self.user_repo = UserRepository()
         self.video_repo = VideoRepository()
         self.channel_repo = ChannelRepository()
@@ -29,8 +26,7 @@ class AdminController:
             total_users = User.select().count()
             total_videos = VideoModel.select().count()
             total_channel= ChannelModel.select().count()
-            # ChannelModel import edilmediyse repo üzerinden de sayabiliriz ama model daha hızlıdır
-            users = self.user_repo.get_all_users() # Repo'da bu metod varsa
+            users = self.user_repo.get_all_users() 
             return {
                 "users": total_users,
                 "videos": total_videos,
@@ -51,7 +47,6 @@ class AdminController:
     def ban_user(self, target_user_id):
         """Kullanıcıyı sistemden siler (Banlar)."""
         # Admin kendisini silememeli
-        # (Bu kontrolü CLI tarafında veya burada yapabiliriz)
         try:
             user = self.user_repo.get_user_by_id(target_user_id)
             if not user:
@@ -75,7 +70,6 @@ class AdminController:
                 return False, "Video bulunamadı."
             
             title = video.video_title
-            # Repo'daki delete fonksiyonunu kullanıyoruz
             self.video_repo.delete_video(video_id)
             
             return True, f"'{title}' videosu yayından kaldırıldı (Admin Kararı)."

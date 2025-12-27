@@ -15,7 +15,10 @@ from models.repositories.video_repository import VideoRepository
 
 # Veritabanını Hazırla
 db.connect()
-db.drop_tables([User, ChannelModel, VideoModel, InteractionModel])
+try:
+    db.drop_tables([InteractionModel, VideoModel, ChannelModel, User], safe=True)
+except:
+    pass
 db.create_tables([User, ChannelModel, VideoModel, InteractionModel])
 
 print("--- VİDEO LİSTELEME VE FİLTRELEME TESTİ ---")

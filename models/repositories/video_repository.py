@@ -36,11 +36,7 @@ class VideoRepository:
     #Video durumuna göre videoları listeleme
     def filter_by_status(self, status):
         status= status.lower().strip()
-        try:
-            return list(VideoModel.select().where(VideoModel.status == status))
-        except DoesNotExist:
-            print("Aranan statüde bir video bulunmamakta")
-            return []
+        return VideoModel.filter_videos_by_status(status)
 
     #Video silme
     def delete_video(self, video_id):
